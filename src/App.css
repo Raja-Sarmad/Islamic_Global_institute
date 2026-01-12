@@ -1,0 +1,6 @@
+body {
+  overflow-x: hidden;
+}
+.react-tel-input .form-control{
+  border: none !important;
+}

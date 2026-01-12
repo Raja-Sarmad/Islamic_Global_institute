@@ -1,0 +1,16 @@
+<svg width="140" height="140" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g opacity="0.8" clip-path="url(#clip0_61_710)">
+<path d="M74.3468 74.3471L66.6545 74.3471C59.2703 74.3471 53.2842 68.361 53.2842 60.9771L53.2842 53.2848L60.9765 53.2848C68.3607 53.2848 74.3468 59.2709 74.3468 66.6548L74.3468 74.3471Z" stroke="#FFD050" stroke-width="4" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M21.6608 8.75355C17.1922 5.91417 11.7322 5.26695 6.81118 6.81105C5.2597 11.7553 5.92032 17.2438 8.79415 21.7241" stroke="#FFD050" stroke-width="4" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M30.2857 30.2857L25.6884 25.6884M25.6884 25.6884C19.3498 19.3498 9.07293 19.3498 2.73438 25.6884L8.45496 31.4089C14.7935 37.7475 25.0704 37.7475 31.4089 31.4089C37.7475 25.0704 37.7475 14.7935 31.4089 8.45496L25.6884 2.73437C19.3498 9.07293 19.3498 19.3498 25.6884 25.6884ZM25.6884 25.6884L25.8934 25.8934" stroke="#FFD050" stroke-width="4" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17.8928 91.2171L17.8928 59.4655C21.2886 59.4655 24.0413 56.7126 24.0413 53.3168C24.0413 48.5743 20.1968 44.7297 15.4543 44.73C9.41516 44.73 4.51953 49.6256 4.51953 55.6648C4.51953 65.3338 12.3579 73.1721 22.0269 73.1721C32.9168 73.1721 41.745 64.3439 41.745 53.454C41.745 45.4792 38.431 38.2782 33.105 33.1535" stroke="#FFD050" stroke-width="4" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17.8936 137.266L17.8936 115.81" stroke="#FFD050" stroke-width="4" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M137.265 17.8932L59.4654 17.8932C59.4654 21.289 56.7124 24.0417 53.3166 24.0417C48.5741 24.0417 44.7296 20.1972 44.7298 15.4547C44.7298 9.41554 49.6255 4.51992 55.6646 4.51992C65.3336 4.51992 73.172 12.3583 73.172 22.0273C73.172 32.9172 64.3438 41.7454 53.4539 41.7454C45.4791 41.7454 38.2781 38.4314 33.1533 33.1054" stroke="#FFD050" stroke-width="4" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="2.73438" cy="2.73438" r="2.73438" transform="matrix(4.37114e-08 1 1 -4.37114e-08 15.1631 100.771)" fill="#FFD050"/>
+</g>
+<defs>
+<clipPath id="clip0_61_710">
+<rect width="140" height="140" fill="white" transform="matrix(4.37114e-08 1 1 -4.37114e-08 0 0)"/>
+</clipPath>
+</defs>
+</svg>
