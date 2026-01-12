@@ -5,7 +5,7 @@ import About from './Pages/AboutUs';
 import ContactUs from './Pages/ContactUs/ContactUs';
 import Courses from './Pages/Courses';
 import FAQs from './Pages/FAQs/FAQs';
-import Home from './pages/Home';
+import Home from './Pages/Home';
 import Pricing from './Pages/Pricing/Pricing';
 // import Modal from './Components/Modal';
 import './App.css';
