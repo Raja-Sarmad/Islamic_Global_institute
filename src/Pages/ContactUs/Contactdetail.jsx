@@ -12,19 +12,19 @@ function ContactDetail() {
   const contactInfo = [
     {
       title: "Our Address",
-      description: "97 Queen Street, London, E30 8EN",
+      description: "H no R-107 Gulistan e Malir, Shah Faisal, Karachi, Pakistan",
       iconSrc: "/Frame 141.svg",
       iconAlt: "Address Icon",
     },
     {
       title: "Phone Number",
-      description: "+447577655475",
+      description: "+92 3132661982",
       iconSrc: "/Frame 143.svg",
       iconAlt: "Phone Icon",
     },
     {
       title: "Email Address",
-      description: "Alqurandigitalinstitute@gmail.com",
+      description: "theislamicglobalinstitute456@gmail.com",
       iconSrc: "/Frame 142.svg",
       iconAlt: "Email Icon",
     },

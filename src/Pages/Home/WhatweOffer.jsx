@@ -10,42 +10,42 @@ const WhatweOffer = () => {
 
   const courses = [
     {
-      title: 'Qaida Noorania Online',
+      title: 'Quran With Tajweed',
       description:
         'This course is a great starting point for children learning the Quran. By the end, students will recognize and pronounce Arabic letters, grasp basic rules, and connect letters accurately, building a strong foundation for reading with correct pronunciation.',
       buttonText: '                Start 3 Days Free Trial',
       icon: '/card-logo-Quran.svg',
     },
     {
-      title: 'Learn Arabic Language',
+      title: 'Quran Memorization (HIFZ)',
       description:
         'Learn to read the Arabic Language online with personalized lessons, guided by experienced tutors. Our interactive platform helps you or your child build Arabic reading and speaking skills with proper pronunciation and fluency from the comfort of home.',
       buttonText: '                Start 3 Days Free Trial',
       icon: '/Frame 1261153731 (2).svg',
     },
     {
-      title: 'Quran Reading with Tajweed',
+      title: 'Quran Tafseer In English & Urdu',
       description:
         'Join our online classes to master Quran reading with Tajweed. Learn accurate pronunciation and proper recitation techniques from skilled tutors, enhancing your understanding and fluency comfortably from home. Strengthen your connection with the Quran today.',
       buttonText: '                Start 3 Days Free Trial',
       icon: '/Frame 1261153737.svg',
     },
     {
-      title: 'Quran Memorization Online',
+      title: 'Ghusal, Wadhu & Salah In English',
       description:
         'Join our Quran Memorization program online to commit the Holy Quran to heart with guided instruction. Our experienced tutors provide personalized support, helping you or your child memorize with precision, from the comfort of your home.',
       buttonText: '                Start 3 Days Free Trial',
       icon: '/Frame 1261153731 (1).svg',
     },
     {
-      title: 'Quran Reading with Tafseer',
+      title: 'Hadiths For Kids With Stories',
       description:
         'Explore Quran reading with Tafseer to deepen your understanding of the verses. Our online sessions provide clear explanations and insights, helping you connect with the teachings and wisdom of the Quran.',
       buttonText: '                Start 3 Days Free Trial',
       icon: '/Frame 1261153737.svg',
     },
     {
-      title: 'Islamic Teachings Online',
+      title: 'Childrens Inslamic Education',
       description:
         'Discover the essence of Islamic teachings through our online courses. We offer a comprehensive platform to explore fundamental principles, values, and practices of Islam, fostering a deeper connection to your faith.',
       buttonText: '                Start 3 Days Free Trial',

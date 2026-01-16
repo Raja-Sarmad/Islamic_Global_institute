@@ -47,7 +47,7 @@ function About() {
                 About Us
               </h1>
               <p className='text-[#1A1A1A] text-lg sm:text-xl md:text-2xl font-medium mt-2 sm:mt-4'>
-                Al Quran Digital Institute
+                Islamic Global Institute
               </p>
             </div>
           </div>
@@ -56,10 +56,10 @@ function About() {
         <div className='grid grid-cols-1 md:grid-cols-12 pt-10 px-4 md:px-16 gap-8 md:gap-16 lg:gap-20 xl:gap-20 2xl:gap-20 '>
           <div className='col-span-12 md:col-span-8'>
             <h1 className='font-medium text-[#1C8E5A] text-3xl md:text-4xl'>
-              Al Quran Digital Institute
+              Islamic Global Institute
             </h1>
             <p className='font-normal text-base md:text-lg text-[#333333] mt-4 '>
-              Al Quran Digital Institute is dedicated to providing high-quality
+              Islamic Global Institute is dedicated to providing high-quality
               Quranic education to students worldwide, emphasizing the profound
               meanings and wisdom behind every holy word revealed by Allah.
               Recognized globally for our outstanding online teaching standards
@@ -89,7 +89,7 @@ function About() {
             Why Study with US
           </h2>
           <h1 className='font-medium text-xl md:text-2xl text-center'>
-          Al Quran Digital Institute
+          Islamic Global Institute
           </h1>
           <p className='text-[#333333] font-normal text-base md:text-lg lg:text-xl'>
             We specialize in online Quran and Tajweed education, enabling you to

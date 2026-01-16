@@ -22,7 +22,7 @@ const WhyChoseMe = () => {
               Why Choose
             </h3>
             <h1 className='text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 text-center md:text-left'>
-              Al Quran Digital Institute
+              Islamic Global Institute 
             </h1>
             <p className='text-gray-600 text-start md:text-left mt-4 text-sm sm:text-base '>
               Our innovative online teaching approach makes learning through the

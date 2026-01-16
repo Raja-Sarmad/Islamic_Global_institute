@@ -23,9 +23,28 @@ function FeesPlans() {
     {
       price: 'Recommended',
       title: '$50/month',
+      frequency: '4 Days/Week',
+      features: ['30 Min Lesson', '20 Classes/Month', '10 hours/Month'],
+    },
+    {
+      price: 'Recommended',
+      title: '$60/month',
       frequency: '5 Days/Week',
       features: ['30 Min Lesson', '20 Classes/Month', '10 hours/Month'],
     },
+    {
+      price: 'Recommended',
+      title: '$70/month',
+      frequency: '6 Days/Week',
+      features: ['30 Min Lesson', '20 Classes/Month', '10 hours/Month'],
+    },
+    {
+      price: 'Recommended',
+      title: '$80/month',
+      frequency: '7 Days/Week',
+      features: ['30 Min Lesson', '20 Classes/Month', '10 hours/Month'],
+    },
+
   ];
 
   const discounts = [
