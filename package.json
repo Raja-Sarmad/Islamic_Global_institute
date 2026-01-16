@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@react-email/components": "^1.0.4",
     "@sendgrid/mail": "^8.1.4",
     "@tehw0lf/contact-form": "^0.21.1",
