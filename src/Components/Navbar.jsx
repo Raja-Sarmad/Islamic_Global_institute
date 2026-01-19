@@ -4,6 +4,7 @@ import { FaBars, FaTimes } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import Modal from '../Components/Modal'; // Import the modal
 
+
 const navLinks = [
   { title: 'Home', url: '/' },
   { title: 'About Us', url: '/about' },
@@ -150,6 +151,7 @@ function Navbar() {
 
       {/* Modal Component */}
       <Modal isOpen={showBookModal} setIsOpen={setShowBookModal} />
+      
     </nav>
   );
 }

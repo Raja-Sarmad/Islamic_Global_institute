@@ -26,7 +26,7 @@ const Carousel = () => {
       title: 'Quran Online Classes',
       description:
         'Experience engaging Quran classes online , tailored for your convenience and spiritual growth!',
-      bgImageDesktop: "bg-[url('/Frame-418.png')]",
+      bgImageDesktop: "bg-[url('/Frame473.png')]",
       bgImageMobile: "bg-[url('/Frame-418.png')]",
     },
   ];
