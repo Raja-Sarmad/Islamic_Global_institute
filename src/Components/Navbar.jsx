@@ -1,79 +1,40 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useState } from 'react';
-import { FaBars, FaTimes } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import Modal from '../Components/Modal'; // Import the modal
-
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useState } from "react";
+import { FaBars, FaTimes } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import AuthModal from "../Components/AuthModal";
 
 const navLinks = [
-  { title: 'Home', url: '/' },
-  { title: 'About Us', url: '/about' },
-  { title: 'Courses', url: '/courses' },
-  { title: 'Pricing', url: '/pricing' },
-  { title: 'Contact Us', url: '/contact' },
-  { title: 'FAQs', url: '/faqs' },
+  { title: "Home", url: "/" },
+  { title: "About Us", url: "/about" },
+  { title: "Courses", url: "/courses" },
+  { title: "Pricing", url: "/pricing" },
+  { title: "Contact Us", url: "/contact" },
+  { title: "FAQs", url: "/faqs" },
 ];
 
 function Navbar() {
-  const [showModal, setShowModal] = useState(false);
-  const [showBookModal, setShowBookModal] = useState(false); // Modal state for Book Now
-  const [activeLink, setActiveLink] = useState('Home');
-
-  const toggleModal = () => {
-    setShowModal(!showModal);
-  };
-
-  const handleSetActive = link => {
-    setActiveLink(link);
-    setShowModal(false);
-  };
-
-  const modalVariants = {
-    hidden: { y: '-100vh' },
-    visible: { y: 0, transition: { type: 'tween', duration: 0.3 } },
-    exit: {
-      y: '-100vh',
-      transition: { type: 'tween', duration: 0.3, delay: 0.3 },
-    },
-  };
-
-  const linkItemVariants = {
-    hidden: { opacity: 0, y: '50%' },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: 'easeOut' },
-    },
-    exit: {
-      opacity: 0,
-      y: '50%',
-      transition: { duration: 0.1, ease: 'easeOut' },
-    },
-  };
-
-  const navLinksVariants = {
-    hidden: {},
-    visible: { transition: { staggerChildren: 0.1, delayChildren: 0.3 } },
-    exit: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
-  };
+  const [showMenu, setShowMenu] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [activeLink, setActiveLink] = useState("Home");
 
   return (
-    <nav className='bg-white py-1 px-4 shadow-md sticky top-0 z-50 text-nowrap'>
-      <div className='container mx-auto flex justify-between items-center'>
-        {/* Logo Section */}
-        <img src='/Logo (2).png' alt='Logo' className='w-24 h-16 object-cover' />
+    <nav className="bg-white py-1 px-4 shadow-md sticky top-0 z-50">
+      <div className="container mx-auto flex justify-between items-center">
+        {/* Logo */}
+        <img src="/Logo (2).png" alt="Logo" className="w-24 h-16" />
 
-        {/* Navbar Links */}
-        <ul className='hidden lg:flex space-x-6 items-center'>
-          {navLinks.map(link => (
-            <Link to={link.url} key={link.title}>
+        {/* Desktop Links */}
+        <ul className="hidden lg:flex space-x-6 items-center">
+          {navLinks.map((link) => (
+            <Link key={link.title} to={link.url}>
               <li
-                onClick={() => handleSetActive(link.title)}
-                className={`${
+                onClick={() => setActiveLink(link.title)}
+                className={`text-sm transition ${
                   activeLink === link.title
-                    ? 'text-black font-semibold'
-                    : 'text-gray-500'
-                } text-sm hover:text-black transition-all duration-300`}
+                    ? "text-black font-semibold"
+                    : "text-gray-500"
+                }`}
               >
                 {link.title}
               </li>
@@ -81,77 +42,66 @@ function Navbar() {
           ))}
         </ul>
 
-        {/* 'Book Now' Button */}
-        <div className='hidden lg:block'>
-          <button
-            onClick={() => setShowBookModal(true)} // Show modal on click
-            className='bg-[#FFD050] text-[#1A1A1A] font-semibold py-2 px-4 rounded-md transition duration-300'
-          >
-            Book Now
-          </button>
-        </div>
+        {/* Auth Button */}
+        <button
+          onClick={() => setShowAuthModal(true)}
+          className="hidden lg:block bg-[#FFD050] px-4 py-2 font-semibold rounded-md"
+        >
+          Login / Register
+        </button>
 
-        {/* Mobile & Tablet Menu Icon */}
-        <div className='lg:hidden'>
-          <FaBars className='text-black text-2xl' onClick={toggleModal} />
+        {/* Mobile */}
+        <div className="lg:hidden">
+          <FaBars onClick={() => setShowMenu(true)} className="text-2xl" />
         </div>
       </div>
 
-      {/* Mobile & Tablet Modal */}
+      {/* Mobile Menu */}
       <AnimatePresence>
-        {showModal && (
+        {showMenu && (
           <motion.div
-            className='fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center' // Updated background color and opacity
-            variants={modalVariants}
-            initial='hidden'
-            animate='visible'
-            exit='exit'
+            className="fixed inset-0 bg-black/80 z-40 flex justify-center items-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
           >
             <FaTimes
-              className='absolute top-6 right-4 text-white h-8 w-6 cursor-pointer'
-              onClick={toggleModal}
-              style={{ fontSize: '24px' }}
+              onClick={() => setShowMenu(false)}
+              className="absolute top-6 right-6 text-white text-2xl"
             />
-            <motion.div
-              className='bg-white w-full max-w-md p-8 rounded-lg'
-              variants={navLinksVariants}
-              initial='hidden'
-              animate='visible'
-              exit='exit'
-            >
-              <ul className='flex flex-col items-center gap-8'>
-                {navLinks.map(link => (
-                  <motion.li key={link.title} variants={linkItemVariants}>
-                    <Link
-                      to={link.url}
-                      onClick={() => handleSetActive(link.title)}
-                      className={`${
-                        activeLink === link.title
-                          ? 'text-black font-semibold'
-                          : 'text-gray-500'
-                      } text-xl`}
-                    >
-                      {link.title}
-                    </Link>
-                  </motion.li>
-                ))}
-                <li>
-                  <button
-                    onClick={() => setShowBookModal(true)} // Show modal on click
-                    className='bg-[#FFD050] text-[#1A1A1A] font-semibold py-2 px-4 rounded-md transition duration-300'
+
+            <div className="bg-white rounded-xl p-8 w-full max-w-sm">
+              <ul className="flex flex-col gap-6 items-center">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.title}
+                    to={link.url}
+                    onClick={() => setShowMenu(false)}
+                    className="text-xl text-gray-700"
                   >
-                    Book Now
-                  </button>
-                </li>
+                    {link.title}
+                  </Link>
+                ))}
+                <button
+                  onClick={() => {
+                    setShowMenu(false);
+                    setShowAuthModal(true);
+                  }}
+                  className="bg-[#FFD050] px-6 py-3 rounded-full font-semibold"
+                >
+                  Login / Register
+                </button>
               </ul>
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Modal Component */}
-      <Modal isOpen={showBookModal} setIsOpen={setShowBookModal} />
-      
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
     </nav>
   );
 }
