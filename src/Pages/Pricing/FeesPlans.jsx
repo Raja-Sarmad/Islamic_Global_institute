@@ -2,6 +2,8 @@ import { motion, useAnimation } from 'framer-motion';
 import React, { useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import Modal from '../../Components/Modal';
+import BankDetailsModal from "../../Components/BankDetailsModal";
+
 
 function FeesPlans() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -188,7 +190,11 @@ function FeesPlans() {
       </div>
 
       {/* Modal Component */}
-      <Modal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
+      <BankDetailsModal
+  isOpen={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+/>
+
     </section>
   );
 }

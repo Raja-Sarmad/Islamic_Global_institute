@@ -1,5 +1,5 @@
 import React from 'react';
-import Crousel from './Crousel';
+import Crousel from '/src/Pages/Home/Crousel.jsx';
 import WhatweOffer from './WhatweOffer';
 import WhyChoseME from './WhyChoseMe';
 import FreeTrail from "../../Pages/AboutUs/FreeTrail";
