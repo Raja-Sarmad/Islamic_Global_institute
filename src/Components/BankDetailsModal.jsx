@@ -39,7 +39,7 @@ export default function BankDetailsModal({ isOpen, onClose }) {
               bank="Bank AlHabib"
               number="13751872027370015"
               holder="Shama Jahan"
-              Swift Code="BAHLPKKA"
+              swiftCode="BAHLPKKA"
               gradient="from-green-700 to-emerald-900"
             />
 
@@ -47,7 +47,7 @@ export default function BankDetailsModal({ isOpen, onClose }) {
               bank="Bank AlHabib"
               number="PK67 BAHL 1375 1872 0273 7001"
               holder="Shama Jahan"
-              Swift Code="BAHLPKKA"
+              swiftCode="BAHLPKKA"
               gradient="from-emerald-700 to-slate-800"
             />
           </div>
@@ -93,7 +93,8 @@ export default function BankDetailsModal({ isOpen, onClose }) {
 
 /* ================= CARD COMPONENT ================= */
 
-function BankCard({ bank, number, holder, bsb, gradient }) {
+ function BankCard({ bank, number, holder, swiftCode, gradient }) {
+
   return (
     <div
       className={`rounded-2xl p-6 text-white bg-gradient-to-br ${gradient} shadow-xl relative overflow-hidden`}
@@ -120,9 +121,10 @@ function BankCard({ bank, number, holder, bsb, gradient }) {
           <p className="font-semibold">{holder}</p>
         </div>
         <div>
-          <p className="opacity-70">BSB</p>
-          <p className="font-semibold">{bsb}</p>
+          <p className="opacity-70">Swift Code</p>
+          <p className="font-semibold tracking-widest">{swiftCode}</p>
         </div>
+
       </div>
 
       {/* Fake shine */}
