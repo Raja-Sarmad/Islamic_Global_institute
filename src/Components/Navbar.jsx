@@ -22,14 +22,14 @@ function Navbar() {
     <nav className="bg-white py-1 px-4 shadow-md sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo */}
-        <img src="/Logo (2).png" alt="Logo" className="w-24 h-16" />
+        <img src="/Logo (2).png" alt="Logo" className="w-24 h-16 object-cover" />
 
         {/* Desktop Links */}
         <ul className="hidden lg:flex space-x-6 items-center">
           {navLinks.map((link) => (
             <Link key={link.title} to={link.url}>
               <li
-                onClick={() => setActiveLink(link.title)}
+                onClick={() => {window.scrollTo(0,0) ;setActiveLink(link.title)}}
                 className={`text-sm transition ${
                   activeLink === link.title
                     ? "text-black font-semibold"
@@ -76,7 +76,7 @@ function Navbar() {
                   <Link
                     key={link.title}
                     to={link.url}
-                    onClick={() => setShowMenu(false)}
+                    onClick={() => {window.scrollTo(0,0) ;setShowMenu(false)}}
                     className="text-xl text-gray-700"
                   >
                     {link.title}

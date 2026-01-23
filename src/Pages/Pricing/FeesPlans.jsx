@@ -50,11 +50,9 @@ function FeesPlans() {
   ];
 
   const discounts = [
-    { label: '15% for New & Disabled Muslims' },
+    { label: '10% for New & Disabled Muslims' },
     { label: '10% discount for siblings' },
     { label: '10% discount on Referrals' },
-    { label: '25% discount on annual payments' },
-    { label: '20% on 6-month payments' },
   ];
 
   const cardVariants = {
