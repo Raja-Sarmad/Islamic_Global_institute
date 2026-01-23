@@ -1,5 +1,13 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
+import {
+  Mail,
+  Lock,
+  User,
+  Phone,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 
 export default function AuthModal({ isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState("login");
@@ -61,24 +69,61 @@ export default function AuthModal({ isOpen, onClose }) {
   );
 }
 
-/* ================= FORMS ================= */
+/* ================= INPUT ================= */
 
-function Input({ placeholder, type = "text" }) {
+function Input({
+  placeholder,
+  type = "text",
+  icon: Icon,
+  isPassword = false,
+}) {
+  const [show, setShow] = useState(false);
+
   return (
-    <input
-      type={type}
-      placeholder={placeholder}
-      className="w-full p-3 rounded-xl border outline-none focus:border-[#1C8E5A]"
-    />
+    <div className="relative">
+      {/* Left Icon */}
+      {Icon && (
+        <Icon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+      )}
+
+      <input
+        type={isPassword && show ? "text" : type}
+        placeholder={placeholder}
+        className={`w-full p-3 ${
+          Icon ? "pl-12" : ""
+        } ${isPassword ? "pr-12" : ""}
+        rounded-xl border outline-none focus:border-[#1C8E5A]`}
+      />
+
+      {/* Eye Toggle */}
+      {isPassword && (
+        <button
+          type="button"
+          onClick={() => setShow(!show)}
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+        >
+          {show ? <Eye size={20} /> : <EyeOff size={20} />}
+        </button>
+      )}
+    </div>
   );
 }
+
+/* ================= FORMS ================= */
 
 function LoginForm() {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-bold text-center">Welcome Back</h2>
-      <Input placeholder="Email" />
-      <Input placeholder="Password" type="password" />
+
+      <Input placeholder="Email" icon={Mail} />
+      <Input
+        placeholder="Password"
+        type="password"
+        icon={Lock}
+        isPassword
+      />
+
       <button className="w-full py-3 bg-[#FFD050] font-semibold rounded-xl">
         Login
       </button>
@@ -90,9 +135,16 @@ function RegisterForm() {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-bold text-center">Create Account</h2>
-      <Input placeholder="Full Name" />
-      <Input placeholder="Email" />
-      <Input placeholder="Password" type="password" />
+
+      <Input placeholder="Full Name" icon={User} />
+      <Input placeholder="Email" icon={Mail} />
+      <Input
+        placeholder="Password"
+        type="password"
+        icon={Lock}
+        isPassword
+      />
+
       <button className="w-full py-3 bg-[#1C8E5A] text-white font-semibold rounded-xl">
         Register
       </button>
@@ -106,9 +158,11 @@ function TrialForm() {
       <h2 className="text-xl font-bold text-center">
         Book 3 Days Free Trial
       </h2>
-      <Input placeholder="Full Name" />
-      <Input placeholder="Email" />
-      <Input placeholder="WhatsApp Number" />
+
+      <Input placeholder="Full Name" icon={User} />
+      <Input placeholder="Email" icon={Mail} />
+      <Input placeholder="WhatsApp Number" icon={Phone} />
+
       <button className="w-full py-3 bg-[#1C8E5A] text-white font-semibold rounded-xl">
         Start Free Trial
       </button>
