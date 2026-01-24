@@ -8,6 +8,11 @@ import FAQs from './Pages/FAQs/FAQs';
 import Home from './Pages/Home';
 import Pricing from './Pages/Pricing/Pricing';
 // import Modal from './Components/Modal';
+
+
+
+
+
 import './App.css';
 function App() {
   return (
