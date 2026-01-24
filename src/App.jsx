@@ -13,6 +13,10 @@ import Pricing from './Pages/Pricing/Pricing';
 
 
 
+
+
+
+
 import './App.css';
 function App() {
   return (
