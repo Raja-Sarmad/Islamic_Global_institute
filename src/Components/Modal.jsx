@@ -2,17 +2,20 @@ import emailjs from 'emailjs-com';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { FiAlertCircle } from 'react-icons/fi';
+import { LockIcon } from 'lucide-react';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import { toast } from 'sonner';
 
-const Modal = ({ isOpen, setIsOpen }) => {
+// Changed setIsOpen to onClose to match the prop passed from WhatweOffer
+const Modal = ({ isOpen, onClose, course }) => {
   // State variables
   const [selectedOption, setSelectedOption] = useState('');
-  const [input1, setInput1] = useState('');
-  const [input2, setInput2] = useState('');
-  const [input3, setInput3] = useState('');
-  const [input4, setInput4] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [input1, setInput1] = useState(''); // Name
+  const [input2, setInput2] = useState(''); // Phone
+  const [input3, setInput3] = useState(''); // Email
+  const [input5, setInput5] = useState(''); // Password
+  const [input4, setInput4] = useState(''); // Message
 
   // Animation variants
   const sectionVariants = {
@@ -20,7 +23,6 @@ const Modal = ({ isOpen, setIsOpen }) => {
     visible: { opacity: 1, transition: { duration: 0.5 } },
   };
 
-  // Email sending function
   const handleEnrollNowClick = () => {
     const templateParams = {
       to_name: 'Admin',
@@ -28,6 +30,8 @@ const Modal = ({ isOpen, setIsOpen }) => {
       user_email: input3,
       user_mobile: input2,
       user_message: input4,
+      course_name: course?.title,
+      password: input5,
     };
 
     emailjs
@@ -39,23 +43,12 @@ const Modal = ({ isOpen, setIsOpen }) => {
       )
       .then(response => {
         console.log('Email sent successfully!', response.status, response.text);
-        alert('Email sent successfully!');
-        // Optionally, clear inputs or close modal here
+        toast.success('Email sent successfully!');
       })
       .catch(error => {
         console.error('Failed to send email:', error);
-        alert('Failed to send email. Please try again.');
+        toast.error('Failed to send email. Please try again.');
       });
-  };
-
-  // Dropdown handling functions
-  const handleOptionClick = option => {
-    setInput4(option);
-    setShowDropdown(false);
-  };
-
-  const handleImageClick = () => {
-    setShowDropdown(prev => !prev);
   };
 
   return (
@@ -65,91 +58,69 @@ const Modal = ({ isOpen, setIsOpen }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={() => setIsOpen(false)}
-          className='bg-slate-900/20 backdrop-blur p-8 fixed inset-0 z-50 grid place-items-center overflow-y-scroll cursor-pointer'
+          onClick={onClose} // Changed to onClose
+          className='bg-slate-900/40 backdrop-blur p-8 fixed inset-0 z-[100] grid place-items-center overflow-y-scroll cursor-pointer'
         >
           <motion.div
             initial={{ scale: 0, rotate: '12.5deg' }}
             animate={{ scale: 1, rotate: '0deg' }}
             exit={{ scale: 0, rotate: '0deg' }}
             onClick={e => e.stopPropagation()}
-            className='bg-gradient-to-br from-[#FFD050] to-[#FFD050] text-white p-6 rounded-lg w-full max-w-lg shadow-xl cursor-default relative overflow-hidden'
+            className='bg-[#FFD050] p-6 rounded-3xl w-full max-w-2xl shadow-xl cursor-default relative overflow-hidden'
           >
-            <FiAlertCircle className='text-white/10 rotate-12 text-[250px] absolute z-0 -top-24 -left-24' />
+            <FiAlertCircle className='text-white/10 rotate-12 text-[250px] absolute z-0 -top-24 -left-24 pointer-events-none' />
 
-            {/* Image Section */}
-            <div className='flex justify-end items-end'>
-              <img
-                src='/si_close-duotone.svg'
-                alt='close'
-                className='cursor-pointer'
-                onClick={() => setIsOpen(false)}
-              />
+            <div className='flex justify-end relative z-[60]'>
+              <button
+                onClick={onClose} // Changed to onClose
+                className="hover:scale-110 transition-transform p-1"
+              >
+                <img
+                  src='/si_close-duotone.svg'
+                  alt='close'
+                  className='w-8 h-8'
+                />
+              </button>
             </div>
 
-            {/* Text and Radio Button Section */}
-            <div className='flex flex-col gap-4 justify-center text-white'>
+            <div className='flex flex-col gap-4 justify-center text-white relative z-10'>
               <motion.h1
-                className='text-[#1C8E5A] font-semibold text-2xl text-center'
+                className='text-gray-900 font-bold text-2xl text-center'
                 variants={sectionVariants}
               >
-                Book 3 Days Free Trial
+                Book <span className='text-[#1C8E5A]'>{course?.title}</span> 3 Days Free Trial
               </motion.h1>
 
               <motion.div
                 className='flex items-center gap-4 justify-center'
                 variants={sectionVariants}
               >
-                <label
-                  className={`flex items-center gap-2 ${
-                    selectedOption === 'Male'
-                      ? 'text-[#1C8E5A]'
-                      : 'text-[#9F9F9F]'
-                  }`}
-                >
+                <label className={`flex items-center gap-2 cursor-pointer font-medium ${selectedOption === 'Male' ? 'text-[#1C8E5A]' : 'text-gray-600'}`}>
                   <input
                     type='radio'
                     value='Male'
                     checked={selectedOption === 'Male'}
                     onChange={() => setSelectedOption('Male')}
-                    className={`form-radio cursor-pointer w-4 h-4 rounded-full border-2 ${
-                      selectedOption === 'Male'
-                        ? 'border-[#1C8E5A]'
-                        : 'border-transparent'
-                    }`}
+                    className={`form-radio w-4 h-4 rounded-full border-2 ${selectedOption === 'Male' ? 'border-[#1C8E5A]' : 'border-transparent'} accent-[#1C8E5A]`}
                   />
                   <span>Male</span>
                 </label>
-                <label
-                  className={`flex items-center gap-2 ${
-                    selectedOption === 'Female'
-                      ? 'text-[#1C8E5A]'
-                      : 'text-[#9F9F9F]'
-                  }`}
-                >
+                <label className={`flex items-center gap-2 cursor-pointer font-medium ${selectedOption === 'Female' ? 'text-[#1C8E5A]' : 'text-gray-600'}`}>
                   <input
                     type='radio'
                     value='Female'
                     checked={selectedOption === 'Female'}
                     onChange={() => setSelectedOption('Female')}
-                    className={`form-radio cursor-pointer w-4 h-4 rounded-full border-2 ${
-                      selectedOption === 'Female'
-                        ? 'border-[#1C8E5A]'
-                        : 'border-transparent'
-                    }`}
+                    className={`form-radio w-4 h-4 rounded-full border-2 ${selectedOption === 'Female' ? 'border-[#1C8E5A]' : 'border-transparent'} accent-[#1C8E5A]`}
                   />
                   <span>Female</span>
                 </label>
               </motion.div>
 
-              {/* Input Fields */}
-              <motion.div
-                className='flex flex-col gap-y-4 mt-4'
-                variants={sectionVariants}
-              >
-                <div className='flex flex-col md:flex-row gap-4 relative'>
+              <motion.div className='flex flex-col gap-y-4 mt-4' variants={sectionVariants}>
+                <div className='flex flex-col md:flex-row gap-4'>
                   <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
-                    <img src='/solar_user-linear.png' alt='' />
+                    <img src='/solar_user-linear.png' alt='' className="w-5" />
                     <hr className='h-7 border-[#9F9F9F] border mx-2' />
                     <input
                       type='text'
@@ -159,8 +130,7 @@ const Modal = ({ isOpen, setIsOpen }) => {
                       className='p-1 rounded-3xl text-black w-full outline-transparent'
                     />
                   </div>
-
-                  <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl relative'>
+                  <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
                     <PhoneInput
                       country={'gb'}
                       value={input2}
@@ -168,7 +138,7 @@ const Modal = ({ isOpen, setIsOpen }) => {
                       enableSearch
                       inputClass='text-black rounded-3xl border-none'
                       buttonClass='rounded-3xl border-none'
-                      dropdownClass='text-black bg-white rounded-3xl shadow-lg border border-gray-300'
+                      dropdownClass='text-black bg-white rounded-3xl shadow-lg'
                       className='flex w-full items-center rounded-3xl'
                     />
                   </div>
@@ -176,38 +146,45 @@ const Modal = ({ isOpen, setIsOpen }) => {
 
                 <div className='flex flex-col md:flex-row gap-4'>
                   <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
-                    <img src='Frame 33.svg' alt='' />
+                    <img src='Frame 33.svg' alt='' className="w-5" />
                     <hr className='h-7 border-[#9F9F9F] border mx-2' />
                     <input
-                      type='text'
+                      type='email'
                       value={input3}
                       onChange={e => setInput3(e.target.value)}
                       placeholder='Email'
                       className='p-1 rounded-3xl text-black w-full outline-transparent'
                     />
                   </div>
-
-                  <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl relative'>
+                  <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
+                    <LockIcon className='text-gray-400 w-5 h-5' />
+                    <hr className='h-7 border-[#9F9F9F] border mx-2' />
                     <input
-                      type='text'
-                      value={input4}
-                      onChange={e => setInput4(e.target.value)}
-                      placeholder='Message'
-                      className='p-[6px] ps-1 rounded-3xl text-black w-full outline-transparent'
+                      type='password'
+                      value={input5}
+                      onChange={e => setInput5(e.target.value)}
+                      placeholder='Password'
+                      className='p-1 rounded-3xl text-black w-full outline-transparent'
                     />
                   </div>
+                </div>
+
+                <div className='flex items-center bg-white p-1 ps-3 w-full rounded-3xl'>
+                  <input
+                    type='text'
+                    value={input4}
+                    onChange={e => setInput4(e.target.value)}
+                    placeholder='Message'
+                    className='p-[6px] ps-1 rounded-3xl text-black w-full outline-transparent'
+                  />
                 </div>
               </motion.div>
             </div>
 
-            {/* Enroll Button */}
-            <motion.div
-              className='flex justify-center mt-4'
-              variants={sectionVariants}
-            >
+            <motion.div className='flex justify-center mt-6 relative z-10' variants={sectionVariants}>
               <button
                 onClick={handleEnrollNowClick}
-                className='px-8 py-3 text-nowrap bg-[#1C8E5A] hover:bg-green-700 font-semibold rounded-3xl transition duration-300'
+                className='px-10 py-3 text-nowrap bg-[#1C8E5A] hover:bg-green-700 text-white font-bold rounded-3xl transition duration-300 w-full md:w-auto shadow-lg'
               >
                 Start 3 Days Free Trial
               </button>

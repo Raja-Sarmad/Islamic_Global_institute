@@ -7,7 +7,23 @@ import {
   Phone,
   Eye,
   EyeOff,
+  BookOpen, // Added for the course icon
 } from "lucide-react";
+import { BsGenderAmbiguous } from "react-icons/bs";
+
+// List of courses from the images
+const COURSES = [
+  "Qaida with Tajweed",
+  "Quran With Tajweed",
+  "Quran Memorization (HIFZ)",
+  "Quran English Translation",
+  "Taleem ul Islam in English",
+  "Quran Urdu Tafseer",
+  "Ghusl Wudhu Salah in English",
+  "40 Hadiths in English for Kids with stories",
+  "Respectful children in Islam",
+  "Essential Dua's for kids",
+];
 
 export default function AuthModal({ isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState("login");
@@ -25,7 +41,7 @@ export default function AuthModal({ isOpen, onClose }) {
       >
         <motion.div
           onClick={(e) => e.stopPropagation()}
-          className="bg-white w-full max-w-md rounded-3xl p-6 relative"
+          className="bg-white w-full max-w-xl rounded-3xl p-6 relative"
           initial={{ scale: 0.85, y: 40 }}
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.85, y: 40 }}
@@ -44,17 +60,16 @@ export default function AuthModal({ isOpen, onClose }) {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-full text-sm font-semibold transition ${
-                  activeTab === tab
-                    ? "bg-[#1C8E5A] text-white"
-                    : "bg-gray-100 text-gray-600"
-                }`}
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition ${activeTab === tab
+                  ? "bg-[#1C8E5A] text-white"
+                  : "bg-gray-100 text-gray-600"
+                  }`}
               >
                 {tab === "login"
                   ? "Login"
                   : tab === "register"
-                  ? "Register"
-                  : "Free Trial"}
+                    ? "Register"
+                    : "Free Trial"}
               </button>
             ))}
           </div>
@@ -69,7 +84,7 @@ export default function AuthModal({ isOpen, onClose }) {
   );
 }
 
-/* ================= INPUT ================= */
+/* ================= INPUT & SELECT ================= */
 
 function Input({
   placeholder,
@@ -89,9 +104,8 @@ function Input({
       <input
         type={isPassword && show ? "text" : type}
         placeholder={placeholder}
-        className={`w-full p-3 ${
-          Icon ? "pl-12" : ""
-        } ${isPassword ? "pr-12" : ""}
+        className={`w-full p-3 ${Icon ? "pl-12" : ""
+          } ${isPassword ? "pr-12" : ""}
         rounded-xl border outline-none focus:border-[#1C8E5A]`}
       />
 
@@ -105,6 +119,33 @@ function Input({
           {show ? <Eye size={20} /> : <EyeOff size={20} />}
         </button>
       )}
+    </div>
+  );
+}
+
+// New Select component for courses
+function Select({ icon: Icon, options, placeholder }) {
+  return (
+    <div className="relative">
+      {Icon && (
+        <Icon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+      )}
+      <select
+        className={`w-full p-3 ${Icon ? "pl-12" : ""} rounded-xl border outline-none focus:border-[#1C8E5A] bg-white appearance-none cursor-pointer`}
+        defaultValue=""
+      >
+        <option value="" disabled>{placeholder}</option>
+        {options.map((course, index) => (
+          <option key={index} value={course}>
+            {course}
+          </option>
+        ))}
+      </select>
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
     </div>
   );
 }
@@ -144,6 +185,10 @@ function RegisterForm() {
         icon={Lock}
         isPassword
       />
+      <Input placeholder="Gender" icon={BsGenderAmbiguous} />
+      <Input placeholder="WhatsApp Number" icon={Phone} />
+      {/* Course Dropdown Added Here */}
+      <Select icon={BookOpen} options={COURSES} placeholder="Select Course" />
 
       <button className="w-full py-3 bg-[#1C8E5A] text-white font-semibold rounded-xl">
         Register
@@ -161,7 +206,11 @@ function TrialForm() {
 
       <Input placeholder="Full Name" icon={User} />
       <Input placeholder="Email" icon={Mail} />
+      <Input placeholder="Password" icon={Lock} type="password" isPassword />
+      <Input placeholder="Gender" icon={BsGenderAmbiguous} />
       <Input placeholder="WhatsApp Number" icon={Phone} />
+      {/* Course Dropdown Added Here */}
+      <Select icon={BookOpen} options={COURSES} placeholder="Select Course" />
 
       <button className="w-full py-3 bg-[#1C8E5A] text-white font-semibold rounded-xl">
         Start Free Trial
