@@ -93,8 +93,8 @@ const WhatweOffer = () => {
 
       {/* Header */}
       <div className="relative z-10 text-center pt-6 pb-4 -mt-6">
-        <p className="text-yellow-400 font-bold text-lg">WHAT WE OFFER</p>
-        <p className="text-white text-2xl font-bold mt-1">
+        <h1 className="text-yellow-400 font-bold md:text-5xl sm:text-4xl text-3xl">WHAT WE OFFER</h1>
+        <p className="text-white md:text-xl font-bold mt-1 px-2">
           We Deliver Top-Quality Arabic & Quran Instruction
         </p>
       </div>
