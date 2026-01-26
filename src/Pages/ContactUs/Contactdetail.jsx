@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import emailjs from "emailjs-com";
+import { toast } from 'sonner';
 
 function ContactDetail() {
   const [input1, setInput1] = useState("");
@@ -59,11 +60,11 @@ function ContactDetail() {
       .then(
         (result) => {
           console.log("Email sent successfully:", result.text);
-          alert("Email sent successfully!");
+          toast.success("Email sent successfully!");
         },
         (error) => {
           console.error("Error sending email:", error);
-          alert("Failed to send the email, please try again.");
+          toast.error("Failed to send the email, please try again.");
         }
       );
   };

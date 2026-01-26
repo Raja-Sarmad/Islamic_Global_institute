@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 
 const PaymentModal = ({ isOpen, setIsOpen, plan }) => {
   const [transactionId, setTransactionId] = useState('');
@@ -112,7 +113,7 @@ const PaymentModal = ({ isOpen, setIsOpen, plan }) => {
             <button
               disabled={!transactionId}
               onClick={() => {
-                alert('Payment submitted successfully!');
+                toast.success('Payment submitted successfully!');
                 setTransactionId('');
                 setIsOpen(false);
               }}

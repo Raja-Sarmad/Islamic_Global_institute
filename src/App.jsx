@@ -7,7 +7,9 @@ import Courses from './Pages/Courses';
 import FAQs from './Pages/FAQs/FAQs';
 import Home from './Pages/Home';
 import Pricing from './Pages/Pricing/Pricing';
+import { Toaster } from 'sonner';
 // import Modal from './Components/Modal';
+
 import './App.css';
 function App() {
   return (
@@ -26,6 +28,17 @@ function App() {
         {/* <Route path="/inputmodal" element={<Modal/>} /> */}
         {/* <Route path='/blogs' element={<Blogs />} /> */}
       </Routes>
+
+      {/* Sonner Toast Provider - positioned at bottom right with Poppins font */}
+      <Toaster
+        position="bottom-right"
+        richColors={true}
+        toastOptions={{
+          style: {
+            fontFamily: 'Poppins, sans-serif',
+          }
+        }}
+      />
     </Router>
   );
 }

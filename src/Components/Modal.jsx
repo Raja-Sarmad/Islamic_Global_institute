@@ -1,26 +1,32 @@
 import emailjs from 'emailjs-com';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiAlertCircle } from 'react-icons/fi';
+import { LockIcon } from 'lucide-react';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import { toast } from 'sonner';
 
-const Modal = ({ isOpen, setIsOpen }) => {
-  // State variables
+const Modal = ({ isOpen, onClose, course }) => {
   const [selectedOption, setSelectedOption] = useState('');
   const [input1, setInput1] = useState('');
   const [input2, setInput2] = useState('');
   const [input3, setInput3] = useState('');
   const [input4, setInput4] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [input5, setInput5] = useState('');
 
-  // Animation variants
+  // ESC key close
+  useEffect(() => {
+    const handleEsc = e => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
   const sectionVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.5 } },
+    visible: { opacity: 1, transition: { duration: 0.4 } },
   };
 
-  // Email sending function
   const handleEnrollNowClick = () => {
     const templateParams = {
       to_name: 'Admin',
@@ -28,6 +34,8 @@ const Modal = ({ isOpen, setIsOpen }) => {
       user_email: input3,
       user_mobile: input2,
       user_message: input4,
+      course_name: course?.title,
+      password: input5,
     };
 
     emailjs
@@ -37,181 +45,121 @@ const Modal = ({ isOpen, setIsOpen }) => {
         templateParams,
         'R7RzaQFicwRxMNsAH'
       )
-      .then(response => {
-        console.log('Email sent successfully!', response.status, response.text);
-        alert('Email sent successfully!');
-        // Optionally, clear inputs or close modal here
+      .then(() => {
+        toast.success('Email sent successfully!');
+        onClose(); // auto close after success
       })
-      .catch(error => {
-        console.error('Failed to send email:', error);
-        alert('Failed to send email. Please try again.');
-      });
-  };
-
-  // Dropdown handling functions
-  const handleOptionClick = option => {
-    setInput4(option);
-    setShowDropdown(false);
-  };
-
-  const handleImageClick = () => {
-    setShowDropdown(prev => !prev);
+      .catch(() => toast.error('Failed to send email'));
   };
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={() => setIsOpen(false)}
-          className='bg-slate-900/20 backdrop-blur p-8 fixed inset-0 z-50 grid place-items-center overflow-y-scroll cursor-pointer'
+          onClick={() => onClose()}
+          className="bg-slate-900/40 backdrop-blur fixed inset-0 z-[100] grid place-items-center p-6 cursor-pointer"
         >
           <motion.div
-            initial={{ scale: 0, rotate: '12.5deg' }}
-            animate={{ scale: 1, rotate: '0deg' }}
-            exit={{ scale: 0, rotate: '0deg' }}
+            initial={{ scale: 0.8, rotate: 10 }}
+            animate={{ scale: 1, rotate: 0 }}
+            exit={{ scale: 0.8, rotate: 0 }}
             onClick={e => e.stopPropagation()}
-            className='bg-gradient-to-br from-[#FFD050] to-[#FFD050] text-white p-6 rounded-lg w-full max-w-lg shadow-xl cursor-default relative overflow-hidden'
+            className="bg-[#FFD050] p-6 rounded-3xl w-full max-w-2xl shadow-xl relative cursor-default"
           >
-            <FiAlertCircle className='text-white/10 rotate-12 text-[250px] absolute z-0 -top-24 -left-24' />
+            <FiAlertCircle className="text-white/10 text-[220px] absolute -top-24 -left-24 rotate-12 pointer-events-none" />
 
-            {/* Image Section */}
-            <div className='flex justify-end items-end'>
-              <img
-                src='/si_close-duotone.svg'
-                alt='close'
-                className='cursor-pointer'
-                onClick={() => setIsOpen(false)}
-              />
+            {/* Close Button */}
+            <div className="flex justify-end">
+              <button onClick={() => onClose()} className="hover:scale-110 transition">
+                <img src="/si_close-duotone.svg" alt="close" className="w-8 h-8" />
+              </button>
             </div>
 
-            {/* Text and Radio Button Section */}
-            <div className='flex flex-col gap-4 justify-center text-white'>
+            {/* Content */}
+            <div className="relative z-10 text-white flex flex-col gap-4">
               <motion.h1
-                className='text-[#1C8E5A] font-semibold text-2xl text-center'
+                className="text-gray-900 font-bold text-2xl text-center"
                 variants={sectionVariants}
+                initial="hidden"
+                animate="visible"
               >
-                Book 3 Days Free Trial
+                Book <span className="text-[#1C8E5A]">{course?.title}</span> 3 Days Free Trial
               </motion.h1>
 
-              <motion.div
-                className='flex items-center gap-4 justify-center'
-                variants={sectionVariants}
-              >
-                <label
-                  className={`flex items-center gap-2 ${
-                    selectedOption === 'Male'
-                      ? 'text-[#1C8E5A]'
-                      : 'text-[#9F9F9F]'
-                  }`}
-                >
-                  <input
-                    type='radio'
-                    value='Male'
-                    checked={selectedOption === 'Male'}
-                    onChange={() => setSelectedOption('Male')}
-                    className={`form-radio cursor-pointer w-4 h-4 rounded-full border-2 ${
-                      selectedOption === 'Male'
-                        ? 'border-[#1C8E5A]'
-                        : 'border-transparent'
+              {/* Gender */}
+              <div className="flex justify-center gap-6">
+                {['Male', 'Female'].map(option => (
+                  <label
+                    key={option}
+                    className={`flex items-center gap-2 cursor-pointer font-medium ${
+                      selectedOption === option ? 'text-[#1C8E5A]' : 'text-gray-600'
                     }`}
-                  />
-                  <span>Male</span>
-                </label>
-                <label
-                  className={`flex items-center gap-2 ${
-                    selectedOption === 'Female'
-                      ? 'text-[#1C8E5A]'
-                      : 'text-[#9F9F9F]'
-                  }`}
-                >
+                  >
+                    <input
+                      type="radio"
+                      checked={selectedOption === option}
+                      onChange={() => setSelectedOption(option)}
+                      className="accent-[#1C8E5A]"
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+
+              {/* Inputs */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                  placeholder="Name"
+                  value={input1}
+                  onChange={e => setInput1(e.target.value)}
+                  className="p-3 rounded-3xl text-black"
+                />
+
+                <PhoneInput
+                  country="gb"
+                  value={input2}
+                  onChange={setInput2}
+                  enableSearch
+                  inputClass="!rounded-3xl !border-none !text-black"
+                />
+
+                <input
+                  placeholder="Email"
+                  value={input3}
+                  onChange={e => setInput3(e.target.value)}
+                  className="p-3 rounded-3xl text-black"
+                />
+
+                <div className="flex items-center bg-white rounded-3xl p-3">
+                  <LockIcon className="w-5 h-5 text-gray-400 mr-2" />
                   <input
-                    type='radio'
-                    value='Female'
-                    checked={selectedOption === 'Female'}
-                    onChange={() => setSelectedOption('Female')}
-                    className={`form-radio cursor-pointer w-4 h-4 rounded-full border-2 ${
-                      selectedOption === 'Female'
-                        ? 'border-[#1C8E5A]'
-                        : 'border-transparent'
-                    }`}
+                    type="password"
+                    placeholder="Password"
+                    value={input5}
+                    onChange={e => setInput5(e.target.value)}
+                    className="w-full outline-none text-black"
                   />
-                  <span>Female</span>
-                </label>
-              </motion.div>
-
-              {/* Input Fields */}
-              <motion.div
-                className='flex flex-col gap-y-4 mt-4'
-                variants={sectionVariants}
-              >
-                <div className='flex flex-col md:flex-row gap-4 relative'>
-                  <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
-                    <img src='/solar_user-linear.png' alt='' />
-                    <hr className='h-7 border-[#9F9F9F] border mx-2' />
-                    <input
-                      type='text'
-                      value={input1}
-                      onChange={e => setInput1(e.target.value)}
-                      placeholder='Name'
-                      className='p-1 rounded-3xl text-black w-full outline-transparent'
-                    />
-                  </div>
-
-                  <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl relative'>
-                    <PhoneInput
-                      country={'gb'}
-                      value={input2}
-                      onChange={phone => setInput2(phone)}
-                      enableSearch
-                      inputClass='text-black rounded-3xl border-none'
-                      buttonClass='rounded-3xl border-none'
-                      dropdownClass='text-black bg-white rounded-3xl shadow-lg border border-gray-300'
-                      className='flex w-full items-center rounded-3xl'
-                    />
-                  </div>
                 </div>
+              </div>
 
-                <div className='flex flex-col md:flex-row gap-4'>
-                  <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
-                    <img src='Frame 33.svg' alt='' />
-                    <hr className='h-7 border-[#9F9F9F] border mx-2' />
-                    <input
-                      type='text'
-                      value={input3}
-                      onChange={e => setInput3(e.target.value)}
-                      placeholder='Email'
-                      className='p-1 rounded-3xl text-black w-full outline-transparent'
-                    />
-                  </div>
+              <input
+                placeholder="Message"
+                value={input4}
+                onChange={e => setInput4(e.target.value)}
+                className="p-3 rounded-3xl text-black"
+              />
 
-                  <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl relative'>
-                    <input
-                      type='text'
-                      value={input4}
-                      onChange={e => setInput4(e.target.value)}
-                      placeholder='Message'
-                      className='p-[6px] ps-1 rounded-3xl text-black w-full outline-transparent'
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Enroll Button */}
-            <motion.div
-              className='flex justify-center mt-4'
-              variants={sectionVariants}
-            >
+              {/* CTA */}
               <button
                 onClick={handleEnrollNowClick}
-                className='px-8 py-3 text-nowrap bg-[#1C8E5A] hover:bg-green-700 font-semibold rounded-3xl transition duration-300'
+                className="mt-4 bg-[#1C8E5A] hover:bg-green-700 text-white font-bold py-3 rounded-3xl transition"
               >
                 Start 3 Days Free Trial
               </button>
-            </motion.div>
+            </div>
           </motion.div>
         </motion.div>
       )}
