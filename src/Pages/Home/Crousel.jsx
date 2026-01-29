@@ -122,7 +122,6 @@ const Carousel = () => {
             <motion.button
               key={`button-${currentIndex}`}
               className='mt-10 md:mt-4 px-4 py-2 bg-yellow-500 text-white rounded'
-              onClick={() => setIsModalOpen(true)}
               variants={buttonVariants}
               initial='hidden'
               animate='visible'

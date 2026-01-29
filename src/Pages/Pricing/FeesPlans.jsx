@@ -59,7 +59,8 @@ function FeesPlans() {
   };
 
   const handleConfirmPayment = () => {
-    setIsModalOpen(false);
+    // This function is called after successful OTP verification
+    // The registration and payment confirmation process is complete
     setShowSuccessMsg(true);
     // Hide message after 10 seconds
     setTimeout(() => setShowSuccessMsg(false), 10000);

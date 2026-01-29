@@ -263,7 +263,7 @@ function RegisterForm() {
       // Use axios with proxy path to handle CORS properly
       const response = await axios.post('/api/v1/auth/register', {
         ...formData,
-        registrationType: 'plan' // Regular registration (paid)
+        registrationType: 'register' // Informational registration (will be contacted later)
       }, {
         headers: {
           'Content-Type': 'application/json',
