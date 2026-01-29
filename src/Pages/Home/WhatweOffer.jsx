@@ -45,6 +45,13 @@ const WhatweOffer = () => {
       icon: '/Frame 1261153731 (1).svg',
     },
     {
+      title: 'Taleem ul Islam in Urdu',
+      description:
+        'Learn essential Islamic practices with step-by-step guidance in an easy and understandable way.',
+      buttonText: 'Start 3 Days Free Trial',
+      icon: '/Frame 1261153731 (1).svg',
+    },
+    {
       title: 'Quran Urdu Tafseer',
       description:
         'Interactive hadith learning for kids with engaging stories to build strong Islamic values.',

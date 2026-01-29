@@ -1,6 +1,6 @@
 import React from 'react';
 import Crousel from '/src/Pages/Home/Crousel.jsx';
-import WhatweOffer from './WhatweOffer';
+import WhatweOffer from '/src/Pages/Home/WhatweOffer';
 import WhyChoseME from './WhyChoseMe';
 import FreeTrail from "../../Pages/AboutUs/FreeTrail";
 import Footer from "../../Components/Footer";
