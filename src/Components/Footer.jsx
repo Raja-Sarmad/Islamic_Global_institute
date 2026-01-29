@@ -1,4 +1,3 @@
-import emailjs from 'emailjs-com'; // Import Email.js
 import { motion, useAnimation } from 'framer-motion';
 import React, { useState } from 'react';
 import { useInView } from 'react-intersection-observer';
@@ -7,6 +6,8 @@ import 'react-phone-input-2/lib/style.css';
 import LastFooter from './LastFooter';
 import { LockIcon, BookOpen } from 'lucide-react'; // Added BookOpen icon
 import { toast } from 'sonner';
+import axios from 'axios';
+import OTPVerification from './OTPVerification';
 
 // Course options extracted from your images
 const COURSES = [
@@ -30,6 +31,8 @@ function Footer() {
   const [input5, setInput5] = useState(''); // Password
   const [input4, setInput4] = useState(''); // Message
   const [course, setCourse] = useState(''); // New state for course
+  const [loading, setLoading] = useState(false);
+  const [showOTPVerification, setShowOTPVerification] = useState(false);
 
   const controls = useAnimation();
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.2 });
@@ -47,50 +50,51 @@ function Footer() {
     },
   };
 
-  const handleEnrollNowClick = () => {
-    // Define the email template parameters
-    const templateParams = {
-      to_name: 'Admin', // Replace with the admin name or email if needed
-      from_name: input1, // User's name
-      user_email: input3, // User's email
-      user_mobile: input2, // User's mobile number
-      user_message: input4, // User's message
-      selected_course: course, // Added course to email params
-      name: input1,
-      mobile: input2,
-      email: input3,
-      message: input4,
-      course: course, // Added course to email params
-    };
+  const handleEnrollNowClick = async () => {
+    // Validate required fields
+    if (!input1 || !input2 || !input3 || !input5 || !course) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
 
-    // Send the email
-    emailjs
-      .send(
-        'service_a684mqv', // Replace with your Email.js service ID
-        'template_x3m5vdh', // Replace with your Email.js template ID
-        templateParams,
-        'R7RzaQFicwRxMNsAH' // Replace with your Email.js user ID
-      )
-      .then(
-        result => {
-          console.log('Email sent successfully:', result.text);
-          toast.success('Email sent successfully!');
-        },
-        error => {
-          console.error('Error sending email:', error);
-          toast.error('Failed to send the email, please try again.');
-        }
-      );
+    setLoading(true);
+    try {
+      // Send the data to the backend API
+      const response = await axios.post('/api/v1/auth/register', {
+        name: input1,
+        email: input3,
+        phone: input2,
+        message: input4,
+        course: course,
+        gender: selectedOption,
+        password: input5,
+        registrationType: 'form' // Free trial registration
+      });
+
+      if (response.data) {
+        toast.success('Registration successful! Please check your email for the OTP.');
+        // Show OTP verification modal instead of resetting
+        setShowOTPVerification(true);
+      } else {
+        toast.error(response.data.message || 'Failed to register');
+      }
+    } catch (error) {
+      console.error('Error submitting registration:', error);
+      toast.error(error.response?.data?.message || 'Failed to register');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <motion.section
-      className='bg-[#1C8E5A] mt-10'
-      ref={ref}
-      variants={sectionVariants}
-      initial='hidden'
-      animate={controls}
-    >
+    <>
+      <motion.section
+        className='bg-[#1C8E5A] mt-10'
+        ref={ref}
+        variants={sectionVariants}
+        initial='hidden'
+        animate={controls}
+      >
       <div className='grid grid-cols-1 md:grid-cols-12 gap-6 bg-[#1C8E5A] overflow-hidden'>
         {/* Left Section with Logo and Text */}
         <motion.div
@@ -249,9 +253,18 @@ function Footer() {
           >
             <button
               onClick={handleEnrollNowClick}
-              className='bg-[#FFD050] font-bold py-2 px-4 rounded-full hover:bg-yellow-400 w-full text-black transition-all duration-300'
+              disabled={loading}
+              className='bg-[#FFD050] font-bold py-2 px-4 rounded-full hover:bg-yellow-400 w-full text-black transition-all duration-300 flex items-center justify-center'
             >
-              Enroll Now
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </>
+              ) : 'Enroll Now'}
             </button>
           </motion.div>
         </motion.div>
@@ -297,6 +310,28 @@ function Footer() {
       </div>
       <LastFooter />
     </motion.section>
+
+    {/* OTP Verification Modal */}
+    {showOTPVerification && (
+      <OTPVerification
+        email={input3}
+        onClose={() => setShowOTPVerification(false)}
+        onSuccess={() => {
+          setShowOTPVerification(false);
+          // Reset form fields after successful verification
+          setInput1('');
+          setInput2('');
+          setInput3('');
+          setInput4('');
+          setInput5('');
+          setCourse('');
+          setSelectedOption('Male');
+          // Redirect to login page after successful verification
+          window.location.href = '/login';
+        }}
+      />
+    )}
+    </>
   );
 }
 

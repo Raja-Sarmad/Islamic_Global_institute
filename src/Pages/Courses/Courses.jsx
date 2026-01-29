@@ -121,7 +121,11 @@ const Courses = () => {
 
         {/* Modal */}
         {isModalOpen && (
-          <Modal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
+          <Modal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            course={courses[activeCardIndex]}
+          />
         )}
       </section>
     </>

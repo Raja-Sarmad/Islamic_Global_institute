@@ -1,3 +1,346 @@
+PROJECT STRUCTURE:
+====================
+
+FILE CONTENTS:
+==============
+
+    ├── .env
+    ├── .gitignore
+    ├── README.md
+    ├── code-to-txt.py
+    ├── combined_project_code.txt
+    ├── eslint.config.js
+    ├── firebase.js
+    ├── index.html
+    ├── package-lock.json
+    ├── package.json
+    ├── postcss.config.js
+    ├── tailwind.config.js
+    ├── txt-to-code.py
+    ├── vite.config.js
+
+--- START OF FILE: .env ---
+
+EMAIL=haseebqamar69@gmail.com
+PASSWORD=Has123456
+
+
+--- END OF FILE: .env ---
+
+================================================================================
+
+
+--- START OF FILE: .gitignore ---
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+
+--- END OF FILE: .gitignore ---
+
+================================================================================
+
+
+--- START OF FILE: README.md ---
+
+# Al Quran Digital Institute 🌟  
+**Empowering Knowledge through Digital Learning**  
+
+🌐 [Visit Website](https://alqurandigitalinstitute.com/)  
+
+---
+
+## 📖 About  
+Al Quran Digital Institute is an online Quran training platform with a modern, user-friendly interface designed to make learning accessible to everyone. The site integrates advanced animations, seamless interactions, and effective communication tools to provide an exceptional user experience.  
+
+---
+
+## ✨ Features  
+
+### 🎨 **Attractive User Interface**  
+- A clean, modern, and intuitive design for an engaging user experience.  
+- Fully responsive layout for mobile, tablet, and desktop devices.  
+
+### 🪄 **Framer Motion Integration**  
+- Smooth animations and transitions powered by Framer Motion.  
+- Interactive and visually appealing effects that enhance user engagement.  
+
+### 📧 **EmailJS Integration**  
+- Easy-to-use contact form to enable instant communication.  
+- Automated email notifications for queries and feedback.  
+
+### 📲 **Social Media Integration**  
+- Direct links to social media platforms for easy sharing and connection.  
+- Seamless interaction to engage with the community.  
+
+### 🌍 **Global Accessibility**  
+- Designed to be accessible and functional for a diverse range of users worldwide.  
+
+---
+
+## 🛠️ Tech Stack  
+
+- **Frontend**: React.js, Tailwind CSS, Framer Motion  
+- **Backend**: EmailJS  
+- **Hosting**: Deployed using secure and scalable hosting services Hostinger.  
+
+--- 
+
+
+--- END OF FILE: README.md ---
+
+================================================================================
+
+
+--- START OF FILE: code-to-txt.py ---
+
+import os
+import argparse
+
+# --- Configuration ---
+EXCLUDED_DIRS = {
+    '.git',
+    'node_modules',
+    '__pycache__',
+    'dist',
+    'build',
+    '.vscode',
+    '.idea',
+    'test-reports',
+    'tests','reporters'
+}
+
+EXCLUDED_EXTENSIONS = {
+    '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.ico', '.svg',
+    '.pdf', '.doc', '.docx', '.xls', '.xlsx',
+    '.zip', '.rar', '.gz', '.tar',
+    '.exe', '.dll', '.so', '.o', '.jar',
+    '.mp4', '.mov', '.avi',
+    '.mp3', '.wav','.test.js'
+    '.lock'
+}
+
+def process_project(root_dir, output_file_path):
+    """
+    Project ko process karta hai: pehle structure banata hai, phir content.
+    Yeh debugging messages bhi print karega.
+    """
+    print("--- SCRIPT STARTING ---")
+    print(f"Project Directory: {os.path.abspath(root_dir)}")
+    print(f"Excluded Directories: {EXCLUDED_DIRS}")
+
+    # Pehle purani output file ko delete kar dein (agar maujood hai)
+    if os.path.exists(output_file_path):
+        os.remove(output_file_path)
+        print(f"Deleted old output file: {output_file_path}")
+
+    with open(output_file_path, 'w', encoding='utf-8') as output_file:
+        # Step 1: Directory Structure
+        output_file.write("PROJECT STRUCTURE:\n====================\n\n")
+        
+        # Step 2: Content
+        output_file.write("FILE CONTENTS:\n==============\n\n")
+
+        # os.walk se sab folders aur files ko process karein
+        for root, dirs, files in os.walk(root_dir, topdown=True):
+            
+            # <<< DEBUGGING LINE >>>
+            print(f"\nCurrently in directory: {root}")
+            
+            # Directories ko filter karein
+            original_dirs = list(dirs) # Original list ko save karein
+            dirs[:] = [d for d in dirs if d.lower() not in EXCLUDED_DIRS]
+            
+            # <<< DEBUGGING LINES >>>
+            # Batayein kon se folders skip kiye gaye
+            skipped_dirs = set(original_dirs) - set(dirs)
+            if skipped_dirs:
+                for skipped in skipped_dirs:
+                    print(f"!!! SKIPPING Directory: {skipped} !!!")
+            
+            # Process files in the current valid directory
+            # Pehle structure likhein
+            level = root.replace(root_dir, '').count(os.sep)
+            if level > 0:
+                 output_file.write(f"{' ' * 4 * (level-1)}└── {os.path.basename(root)}/\n")
+            
+            sub_indent = ' ' * 4 * (level + 1)
+            
+            for f in sorted(files):
+                 if not any(f.lower().endswith(ext) for ext in EXCLUDED_EXTENSIONS):
+                    output_file.write(f"{sub_indent}├── {f}\n")
+            
+            # Phir content likhein
+            for filename in sorted(files):
+                if any(filename.lower().endswith(ext) for ext in EXCLUDED_EXTENSIONS):
+                    continue
+
+                file_path = os.path.join(root, filename)
+                relative_path = os.path.relpath(file_path, root_dir)
+
+                try:
+                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                        content = f.read()
+                    
+                    output_file.write(f"\n--- START OF FILE: {relative_path} ---\n\n")
+                    output_file.write(content)
+                    output_file.write(f"\n\n--- END OF FILE: {relative_path} ---\n\n" + "="*80 + "\n\n")
+
+                except Exception as e:
+                    output_file.write(f"\n--- Could not read file: {relative_path} (Error: {e}) ---\n\n" + "="*80 + "\n\n")
+
+def main():
+    parser = argparse.ArgumentParser(description="Combine project files into a single text file with debugging.")
+    parser.add_argument("project_dir", type=str, help="Project ka path.")
+    parser.add_argument("output_file", type=str, nargs='?', default="combined_project_code.txt", help="Output file ka naam.")
+    args = parser.parse_args()
+
+    if not os.path.isdir(args.project_dir):
+        print(f"Error: Directory not found at '{args.project_dir}'")
+        return
+    
+    process_project(args.project_dir, args.output_file)
+    print(f"\n--- SCRIPT FINISHED ---")
+    print(f"Output saved to '{args.output_file}'")
+
+if __name__ == "__main__":
+    main()
+
+--- END OF FILE: code-to-txt.py ---
+
+================================================================================
+
+
+--- START OF FILE: combined_project_code.txt ---
+
+
+
+--- END OF FILE: combined_project_code.txt ---
+
+================================================================================
+
+
+--- START OF FILE: eslint.config.js ---
+
+import js from '@eslint/js'
+import globals from 'globals'
+import react from 'eslint-plugin-react'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+
+export default [
+  { ignores: ['dist'] },
+  {
+    files: ['**/*.{js,jsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    settings: { react: { version: '18.3' } },
+    plugins: {
+      react,
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...react.configs.recommended.rules,
+      ...react.configs['jsx-runtime'].rules,
+      ...reactHooks.configs.recommended.rules,
+      'react/jsx-no-target-blank': 'off',
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+    },
+  },
+]
+
+
+--- END OF FILE: eslint.config.js ---
+
+================================================================================
+
+
+--- START OF FILE: firebase.js ---
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCHR3RGPgxXXPl5sDCFxcMhYRwDeefJ4s0",
+  authDomain: "smartquran-15e1d.firebaseapp.com",
+  projectId: "smartquran-15e1d",
+  storageBucket: "smartquran-15e1d.appspot.com",
+  messagingSenderId: "583994431669",
+    appId: "1:583994431669:web:3c45b66991a1f341a146fc",
+  databaseURL:"https://console.firebase.google.com/u/0/project/smartquran-15e1d/database/smartquran-15e1d-default-rtdb/data/~2F"
+};
+
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+
+--- END OF FILE: firebase.js ---
+
+================================================================================
+
+
+--- START OF FILE: index.html ---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/Logo (2).png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Islamic Global Institute</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+
+--- END OF FILE: index.html ---
+
+================================================================================
+
+
+--- START OF FILE: package-lock.json ---
+
 {
   "name": "smart-quran-institute",
   "version": "0.0.0",
@@ -11,13 +354,10 @@
       "dependencies": {
         "@emailjs/browser": "^4.4.1",
         "@react-email/components": "^1.0.4",
-        "@reduxjs/toolkit": "^2.11.2",
         "@sendgrid/mail": "^8.1.4",
         "@tehw0lf/contact-form": "^0.21.1",
-        "axios": "^1.13.4",
         "body-parser": "^1.20.3",
         "cors": "^2.8.5",
-        "date-fns": "^4.1.0",
         "dotenv": "^16.4.5",
         "emailjs-com": "^3.2.0",
         "express": "^4.21.1",
@@ -30,9 +370,7 @@
         "react-icons": "^5.3.0",
         "react-intersection-observer": "^9.13.1",
         "react-phone-input-2": "^2.15.1",
-        "react-redux": "^9.2.0",
         "react-router-dom": "^6.27.0",
-        "recharts": "^3.7.0",
         "sonner": "^2.0.7"
       },
       "devDependencies": {
@@ -2269,32 +2607,6 @@
         "react": "^18.0 || ^19.0 || ^19.0.0-rc"
       }
     },
-    "node_modules/@reduxjs/toolkit": {
-      "version": "2.11.2",
-      "resolved": "https://registry.npmjs.org/@reduxjs/toolkit/-/toolkit-2.11.2.tgz",
-      "integrity": "sha512-Kd6kAHTA6/nUpp8mySPqj3en3dm0tdMIgbttnQ1xFMVpufoj+ADi8pXLBsd4xzTRHQa7t/Jv8W5UnCuW4kuWMQ==",
-      "license": "MIT",
-      "dependencies": {
-        "@standard-schema/spec": "^1.0.0",
-        "@standard-schema/utils": "^0.3.0",
-        "immer": "^11.0.0",
-        "redux": "^5.0.1",
-        "redux-thunk": "^3.1.0",
-        "reselect": "^5.1.0"
-      },
-      "peerDependencies": {
-        "react": "^16.9.0 || ^17.0.0 || ^18 || ^19",
-        "react-redux": "^7.2.1 || ^8.1.3 || ^9.0.0"
-      },
-      "peerDependenciesMeta": {
-        "react": {
-          "optional": true
-        },
-        "react-redux": {
-          "optional": true
-        }
-      }
-    },
     "node_modules/@remix-run/router": {
       "version": "1.23.2",
       "resolved": "https://registry.npmjs.org/@remix-run/router/-/router-1.23.2.tgz",
@@ -2713,13 +3025,8 @@
       "version": "1.1.0",
       "resolved": "https://registry.npmjs.org/@standard-schema/spec/-/spec-1.1.0.tgz",
       "integrity": "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==",
-      "license": "MIT"
-    },
-    "node_modules/@standard-schema/utils": {
-      "version": "0.3.0",
-      "resolved": "https://registry.npmjs.org/@standard-schema/utils/-/utils-0.3.0.tgz",
-      "integrity": "sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==",
-      "license": "MIT"
+      "license": "MIT",
+      "peer": true
     },
     "node_modules/@tehw0lf/contact-form": {
       "version": "0.21.2",
@@ -2791,69 +3098,6 @@
         "@babel/types": "^7.20.7"
       }
     },
-    "node_modules/@types/d3-array": {
-      "version": "3.2.2",
-      "resolved": "https://registry.npmjs.org/@types/d3-array/-/d3-array-3.2.2.tgz",
-      "integrity": "sha512-hOLWVbm7uRza0BYXpIIW5pxfrKe0W+D5lrFiAEYR+pb6w3N2SwSMaJbXdUfSEv+dT4MfHBLtn5js0LAWaO6otw==",
-      "license": "MIT"
-    },
-    "node_modules/@types/d3-color": {
-      "version": "3.1.3",
-      "resolved": "https://registry.npmjs.org/@types/d3-color/-/d3-color-3.1.3.tgz",
-      "integrity": "sha512-iO90scth9WAbmgv7ogoq57O9YpKmFBbmoEoCHDB2xMBY0+/KVrqAaCDyCE16dUspeOvIxFFRI+0sEtqDqy2b4A==",
-      "license": "MIT"
-    },
-    "node_modules/@types/d3-ease": {
-      "version": "3.0.2",
-      "resolved": "https://registry.npmjs.org/@types/d3-ease/-/d3-ease-3.0.2.tgz",
-      "integrity": "sha512-NcV1JjO5oDzoK26oMzbILE6HW7uVXOHLQvHshBUW4UMdZGfiY6v5BeQwh9a9tCzv+CeefZQHJt5SRgK154RtiA==",
-      "license": "MIT"
-    },
-    "node_modules/@types/d3-interpolate": {
-      "version": "3.0.4",
-      "resolved": "https://registry.npmjs.org/@types/d3-interpolate/-/d3-interpolate-3.0.4.tgz",
-      "integrity": "sha512-mgLPETlrpVV1YRJIglr4Ez47g7Yxjl1lj7YKsiMCb27VJH9W8NVM6Bb9d8kkpG/uAQS5AmbA48q2IAolKKo1MA==",
-      "license": "MIT",
-      "dependencies": {
-        "@types/d3-color": "*"
-      }
-    },
-    "node_modules/@types/d3-path": {
-      "version": "3.1.1",
-      "resolved": "https://registry.npmjs.org/@types/d3-path/-/d3-path-3.1.1.tgz",
-      "integrity": "sha512-VMZBYyQvbGmWyWVea0EHs/BwLgxc+MKi1zLDCONksozI4YJMcTt8ZEuIR4Sb1MMTE8MMW49v0IwI5+b7RmfWlg==",
-      "license": "MIT"
-    },
-    "node_modules/@types/d3-scale": {
-      "version": "4.0.9",
-      "resolved": "https://registry.npmjs.org/@types/d3-scale/-/d3-scale-4.0.9.tgz",
-      "integrity": "sha512-dLmtwB8zkAeO/juAMfnV+sItKjlsw2lKdZVVy6LRr0cBmegxSABiLEpGVmSJJ8O08i4+sGR6qQtb6WtuwJdvVw==",
-      "license": "MIT",
-      "dependencies": {
-        "@types/d3-time": "*"
-      }
-    },
-    "node_modules/@types/d3-shape": {
-      "version": "3.1.8",
-      "resolved": "https://registry.npmjs.org/@types/d3-shape/-/d3-shape-3.1.8.tgz",
-      "integrity": "sha512-lae0iWfcDeR7qt7rA88BNiqdvPS5pFVPpo5OfjElwNaT2yyekbM0C9vK+yqBqEmHr6lDkRnYNoTBYlAgJa7a4w==",
-      "license": "MIT",
-      "dependencies": {
-        "@types/d3-path": "*"
-      }
-    },
-    "node_modules/@types/d3-time": {
-      "version": "3.0.4",
-      "resolved": "https://registry.npmjs.org/@types/d3-time/-/d3-time-3.0.4.tgz",
-      "integrity": "sha512-yuzZug1nkAAaBlBBikKZTgzCeA+k1uy4ZFwWANOfKw5z5LRhV0gNA7gNkKm7HoK+HRN0wX3EkxGk0fpbWhmB7g==",
-      "license": "MIT"
-    },
-    "node_modules/@types/d3-timer": {
-      "version": "3.0.2",
-      "resolved": "https://registry.npmjs.org/@types/d3-timer/-/d3-timer-3.0.2.tgz",
-      "integrity": "sha512-Ps3T8E8dZDam6fUyNiMkekK3XUsaUEik+idO9/YjPtfj2qruF8tFBXS7XhtE4iIXBLxhmLjP3SXpLhVf21I9Lw==",
-      "license": "MIT"
-    },
     "node_modules/@types/estree": {
       "version": "1.0.8",
       "resolved": "https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz",
@@ -2881,14 +3125,14 @@
       "version": "15.7.13",
       "resolved": "https://registry.npmjs.org/@types/prop-types/-/prop-types-15.7.13.tgz",
       "integrity": "sha512-hCZTSvwbzWGvhqxp/RqVqwU999pBf2vp7hzIjiYOsl8wqOmUxkQ6ddw1cV3l8811+kdUFus/q4d1Y3E3SyEifA==",
-      "devOptional": true,
+      "dev": true,
       "license": "MIT"
     },
     "node_modules/@types/react": {
       "version": "18.3.11",
       "resolved": "https://registry.npmjs.org/@types/react/-/react-18.3.11.tgz",
       "integrity": "sha512-r6QZ069rFTjrEYgFdOck1gK7FLVsgJE7tTz0pQBczlBNUhBNk0MQH4UbnFSwjpQLMkLzgqvBBa+qGpLje16eTQ==",
-      "devOptional": true,
+      "dev": true,
       "license": "MIT",
       "dependencies": {
         "@types/prop-types": "*",
@@ -2904,12 +3148,6 @@
       "dependencies": {
         "@types/react": "*"
       }
-    },
-    "node_modules/@types/use-sync-external-store": {
-      "version": "0.0.6",
-      "resolved": "https://registry.npmjs.org/@types/use-sync-external-store/-/use-sync-external-store-0.0.6.tgz",
-      "integrity": "sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==",
-      "license": "MIT"
     },
     "node_modules/@vitejs/plugin-react": {
       "version": "4.7.0",
@@ -3235,9 +3473,9 @@
       }
     },
     "node_modules/axios": {
-      "version": "1.13.4",
-      "resolved": "https://registry.npmjs.org/axios/-/axios-1.13.4.tgz",
-      "integrity": "sha512-1wVkUaAO6WyaYtCkcYCOx12ZgpGf9Zif+qXa4n+oYzK558YryKqiL6UWwd5DqiH3VRW0GYhTZQ/vlgJrCoNQlg==",
+      "version": "1.13.2",
+      "resolved": "https://registry.npmjs.org/axios/-/axios-1.13.2.tgz",
+      "integrity": "sha512-VPk9ebNqPcy5lRGuSlKx752IlDatOjT9paPlm8A7yOuW2Fbvp4X3JznJtT4f0GzGLLiWE9W8onz51SqLYwzGaA==",
       "license": "MIT",
       "dependencies": {
         "follow-redirects": "^1.15.6",
@@ -3467,9 +3705,9 @@
       }
     },
     "node_modules/caniuse-lite": {
-      "version": "1.0.30001766",
-      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001766.tgz",
-      "integrity": "sha512-4C0lfJ0/YPjJQHagaE9x2Elb69CIqEPZeG0anQt9SIvIoOH4a4uaRl73IavyO+0qZh6MDLH//DrXThEYKHkmYA==",
+      "version": "1.0.30001668",
+      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001668.tgz",
+      "integrity": "sha512-nWLrdxqCdblixUO+27JtGJJE/txpJlyUy5YN1u53wLZkP0emYCo5zgS6QYft7VUYR42LGgi/S5hdLZTrnyIddw==",
       "dev": true,
       "funding": [
         {
@@ -3626,15 +3864,6 @@
         "url": "https://github.com/chalk/wrap-ansi?sponsor=1"
       }
     },
-    "node_modules/clsx": {
-      "version": "2.1.1",
-      "resolved": "https://registry.npmjs.org/clsx/-/clsx-2.1.1.tgz",
-      "integrity": "sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==",
-      "license": "MIT",
-      "engines": {
-        "node": ">=6"
-      }
-    },
     "node_modules/combined-stream": {
       "version": "1.0.8",
       "resolved": "https://registry.npmjs.org/combined-stream/-/combined-stream-1.0.8.tgz",
@@ -3747,129 +3976,8 @@
       "version": "3.1.3",
       "resolved": "https://registry.npmjs.org/csstype/-/csstype-3.1.3.tgz",
       "integrity": "sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==",
-      "devOptional": true,
+      "dev": true,
       "license": "MIT"
-    },
-    "node_modules/d3-array": {
-      "version": "3.2.4",
-      "resolved": "https://registry.npmjs.org/d3-array/-/d3-array-3.2.4.tgz",
-      "integrity": "sha512-tdQAmyA18i4J7wprpYq8ClcxZy3SC31QMeByyCFyRt7BVHdREQZ5lpzoe5mFEYZUWe+oq8HBvk9JjpibyEV4Jg==",
-      "license": "ISC",
-      "dependencies": {
-        "internmap": "1 - 2"
-      },
-      "engines": {
-        "node": ">=12"
-      }
-    },
-    "node_modules/d3-color": {
-      "version": "3.1.0",
-      "resolved": "https://registry.npmjs.org/d3-color/-/d3-color-3.1.0.tgz",
-      "integrity": "sha512-zg/chbXyeBtMQ1LbD/WSoW2DpC3I0mpmPdW+ynRTj/x2DAWYrIY7qeZIHidozwV24m4iavr15lNwIwLxRmOxhA==",
-      "license": "ISC",
-      "engines": {
-        "node": ">=12"
-      }
-    },
-    "node_modules/d3-ease": {
-      "version": "3.0.1",
-      "resolved": "https://registry.npmjs.org/d3-ease/-/d3-ease-3.0.1.tgz",
-      "integrity": "sha512-wR/XK3D3XcLIZwpbvQwQ5fK+8Ykds1ip7A2Txe0yxncXSdq1L9skcG7blcedkOX+ZcgxGAmLX1FrRGbADwzi0w==",
-      "license": "BSD-3-Clause",
-      "engines": {
-        "node": ">=12"
-      }
-    },
-    "node_modules/d3-format": {
-      "version": "3.1.2",
-      "resolved": "https://registry.npmjs.org/d3-format/-/d3-format-3.1.2.tgz",
-      "integrity": "sha512-AJDdYOdnyRDV5b6ArilzCPPwc1ejkHcoyFarqlPqT7zRYjhavcT3uSrqcMvsgh2CgoPbK3RCwyHaVyxYcP2Arg==",
-      "license": "ISC",
-      "engines": {
-        "node": ">=12"
-      }
-    },
-    "node_modules/d3-interpolate": {
-      "version": "3.0.1",
-      "resolved": "https://registry.npmjs.org/d3-interpolate/-/d3-interpolate-3.0.1.tgz",
-      "integrity": "sha512-3bYs1rOD33uo8aqJfKP3JWPAibgw8Zm2+L9vBKEHJ2Rg+viTR7o5Mmv5mZcieN+FRYaAOWX5SJATX6k1PWz72g==",
-      "license": "ISC",
-      "dependencies": {
-        "d3-color": "1 - 3"
-      },
-      "engines": {
-        "node": ">=12"
-      }
-    },
-    "node_modules/d3-path": {
-      "version": "3.1.0",
-      "resolved": "https://registry.npmjs.org/d3-path/-/d3-path-3.1.0.tgz",
-      "integrity": "sha512-p3KP5HCf/bvjBSSKuXid6Zqijx7wIfNW+J/maPs+iwR35at5JCbLUT0LzF1cnjbCHWhqzQTIN2Jpe8pRebIEFQ==",
-      "license": "ISC",
-      "engines": {
-        "node": ">=12"
-      }
-    },
-    "node_modules/d3-scale": {
-      "version": "4.0.2",
-      "resolved": "https://registry.npmjs.org/d3-scale/-/d3-scale-4.0.2.tgz",
-      "integrity": "sha512-GZW464g1SH7ag3Y7hXjf8RoUuAFIqklOAq3MRl4OaWabTFJY9PN/E1YklhXLh+OQ3fM9yS2nOkCoS+WLZ6kvxQ==",
-      "license": "ISC",
-      "dependencies": {
-        "d3-array": "2.10.0 - 3",
-        "d3-format": "1 - 3",
-        "d3-interpolate": "1.2.0 - 3",
-        "d3-time": "2.1.1 - 3",
-        "d3-time-format": "2 - 4"
-      },
-      "engines": {
-        "node": ">=12"
-      }
-    },
-    "node_modules/d3-shape": {
-      "version": "3.2.0",
-      "resolved": "https://registry.npmjs.org/d3-shape/-/d3-shape-3.2.0.tgz",
-      "integrity": "sha512-SaLBuwGm3MOViRq2ABk3eLoxwZELpH6zhl3FbAoJ7Vm1gofKx6El1Ib5z23NUEhF9AsGl7y+dzLe5Cw2AArGTA==",
-      "license": "ISC",
-      "dependencies": {
-        "d3-path": "^3.1.0"
-      },
-      "engines": {
-        "node": ">=12"
-      }
-    },
-    "node_modules/d3-time": {
-      "version": "3.1.0",
-      "resolved": "https://registry.npmjs.org/d3-time/-/d3-time-3.1.0.tgz",
-      "integrity": "sha512-VqKjzBLejbSMT4IgbmVgDjpkYrNWUYJnbCGo874u7MMKIWsILRX+OpX/gTk8MqjpT1A/c6HY2dCA77ZN0lkQ2Q==",
-      "license": "ISC",
-      "dependencies": {
-        "d3-array": "2 - 3"
-      },
-      "engines": {
-        "node": ">=12"
-      }
-    },
-    "node_modules/d3-time-format": {
-      "version": "4.1.0",
-      "resolved": "https://registry.npmjs.org/d3-time-format/-/d3-time-format-4.1.0.tgz",
-      "integrity": "sha512-dJxPBlzC7NugB2PDLwo9Q8JiTR3M3e4/XANkreKSUxF8vvXKqm1Yfq4Q5dl8budlunRVlUUaDUgFt7eA8D6NLg==",
-      "license": "ISC",
-      "dependencies": {
-        "d3-time": "1 - 3"
-      },
-      "engines": {
-        "node": ">=12"
-      }
-    },
-    "node_modules/d3-timer": {
-      "version": "3.0.1",
-      "resolved": "https://registry.npmjs.org/d3-timer/-/d3-timer-3.0.1.tgz",
-      "integrity": "sha512-ndfJ/JxxMd3nw31uyKoY2naivF+r29V+Lc0svZxe1JvvIRmi8hUsrMvdOwgS1o6uBHmiz91geQ0ylPP0aj1VUA==",
-      "license": "ISC",
-      "engines": {
-        "node": ">=12"
-      }
     },
     "node_modules/data-view-buffer": {
       "version": "1.0.1",
@@ -3925,16 +4033,6 @@
         "url": "https://github.com/sponsors/ljharb"
       }
     },
-    "node_modules/date-fns": {
-      "version": "4.1.0",
-      "resolved": "https://registry.npmjs.org/date-fns/-/date-fns-4.1.0.tgz",
-      "integrity": "sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==",
-      "license": "MIT",
-      "funding": {
-        "type": "github",
-        "url": "https://github.com/sponsors/kossnocorp"
-      }
-    },
     "node_modules/debug": {
       "version": "4.4.3",
       "resolved": "https://registry.npmjs.org/debug/-/debug-4.4.3.tgz",
@@ -3952,12 +4050,6 @@
           "optional": true
         }
       }
-    },
-    "node_modules/decimal.js-light": {
-      "version": "2.5.1",
-      "resolved": "https://registry.npmjs.org/decimal.js-light/-/decimal.js-light-2.5.1.tgz",
-      "integrity": "sha512-qIMFpTMZmny+MMIitAB6D7iVPEorVw6YQRWkvarTkT4tBeSLLiHzcwj6q0MmYSFCiVpiqPJTJEYIrpcPzVEIvg==",
-      "license": "MIT"
     },
     "node_modules/deep-is": {
       "version": "0.1.4",
@@ -4371,16 +4463,6 @@
         "url": "https://github.com/sponsors/ljharb"
       }
     },
-    "node_modules/es-toolkit": {
-      "version": "1.44.0",
-      "resolved": "https://registry.npmjs.org/es-toolkit/-/es-toolkit-1.44.0.tgz",
-      "integrity": "sha512-6penXeZalaV88MM3cGkFZZfOoLGWshWWfdy0tWw/RlVVyhvMaWSBTOvXNeiW3e5FwdS5ePW0LGEu17zT139ktg==",
-      "license": "MIT",
-      "workspaces": [
-        "docs",
-        "benchmarks"
-      ]
-    },
     "node_modules/esbuild": {
       "version": "0.27.2",
       "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.27.2.tgz",
@@ -4743,12 +4825,6 @@
       "engines": {
         "node": ">= 0.6"
       }
-    },
-    "node_modules/eventemitter3": {
-      "version": "5.0.4",
-      "resolved": "https://registry.npmjs.org/eventemitter3/-/eventemitter3-5.0.4.tgz",
-      "integrity": "sha512-mlsTRyGaPBjPedk6Bvw+aqbsXDtoAyAzm5MO7JgU+yVRyMQ5O8bD4Kcci7BS85f93veegeCPkL8R4GLClnjLFw==",
-      "license": "MIT"
     },
     "node_modules/express": {
       "version": "4.22.1",
@@ -5523,16 +5599,6 @@
         "node": ">= 4"
       }
     },
-    "node_modules/immer": {
-      "version": "11.1.3",
-      "resolved": "https://registry.npmjs.org/immer/-/immer-11.1.3.tgz",
-      "integrity": "sha512-6jQTc5z0KJFtr1UgFpIL3N9XSC3saRaI9PwWtzM2pSqkNGtiNkYY2OSwkOGDK2XcTRcLb1pi/aNkKZz0nxVH4Q==",
-      "license": "MIT",
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/immer"
-      }
-    },
     "node_modules/import-fresh": {
       "version": "3.3.1",
       "resolved": "https://registry.npmjs.org/import-fresh/-/import-fresh-3.3.1.tgz",
@@ -5578,15 +5644,6 @@
       },
       "engines": {
         "node": ">= 0.4"
-      }
-    },
-    "node_modules/internmap": {
-      "version": "2.0.3",
-      "resolved": "https://registry.npmjs.org/internmap/-/internmap-2.0.3.tgz",
-      "integrity": "sha512-5Hh7Y1wQbvY5ooGgPbDaL5iYLAPzMTUrjMulskHLH6wnv/A+1q5rgEaiuqEjB+oxGXIVZs1FF+R/KPN3ZSQYYg==",
-      "license": "ISC",
-      "engines": {
-        "node": ">=12"
       }
     },
     "node_modules/ipaddr.js": {
@@ -7245,29 +7302,6 @@
         "react-dom": "^16.12.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0 || ^21.0.0"
       }
     },
-    "node_modules/react-redux": {
-      "version": "9.2.0",
-      "resolved": "https://registry.npmjs.org/react-redux/-/react-redux-9.2.0.tgz",
-      "integrity": "sha512-ROY9fvHhwOD9ySfrF0wmvu//bKCQ6AeZZq1nJNtbDC+kk5DuSuNX/n6YWYF/SYy7bSba4D4FSz8DJeKY/S/r+g==",
-      "license": "MIT",
-      "dependencies": {
-        "@types/use-sync-external-store": "^0.0.6",
-        "use-sync-external-store": "^1.4.0"
-      },
-      "peerDependencies": {
-        "@types/react": "^18.2.25 || ^19",
-        "react": "^18.0 || ^19",
-        "redux": "^5.0.0"
-      },
-      "peerDependenciesMeta": {
-        "@types/react": {
-          "optional": true
-        },
-        "redux": {
-          "optional": true
-        }
-      }
-    },
     "node_modules/react-refresh": {
       "version": "0.17.0",
       "resolved": "https://registry.npmjs.org/react-refresh/-/react-refresh-0.17.0.tgz",
@@ -7333,61 +7367,6 @@
         "node": ">=8.10.0"
       }
     },
-    "node_modules/recharts": {
-      "version": "3.7.0",
-      "resolved": "https://registry.npmjs.org/recharts/-/recharts-3.7.0.tgz",
-      "integrity": "sha512-l2VCsy3XXeraxIID9fx23eCb6iCBsxUQDnE8tWm6DFdszVAO7WVY/ChAD9wVit01y6B2PMupYiMmQwhgPHc9Ew==",
-      "license": "MIT",
-      "workspaces": [
-        "www"
-      ],
-      "dependencies": {
-        "@reduxjs/toolkit": "1.x.x || 2.x.x",
-        "clsx": "^2.1.1",
-        "decimal.js-light": "^2.5.1",
-        "es-toolkit": "^1.39.3",
-        "eventemitter3": "^5.0.1",
-        "immer": "^10.1.1",
-        "react-redux": "8.x.x || 9.x.x",
-        "reselect": "5.1.1",
-        "tiny-invariant": "^1.3.3",
-        "use-sync-external-store": "^1.2.2",
-        "victory-vendor": "^37.0.2"
-      },
-      "engines": {
-        "node": ">=18"
-      },
-      "peerDependencies": {
-        "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
-        "react-dom": "^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
-        "react-is": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
-      }
-    },
-    "node_modules/recharts/node_modules/immer": {
-      "version": "10.2.0",
-      "resolved": "https://registry.npmjs.org/immer/-/immer-10.2.0.tgz",
-      "integrity": "sha512-d/+XTN3zfODyjr89gM3mPq1WNX2B8pYsu7eORitdwyA2sBubnTl3laYlBk4sXY5FUa5qTZGBDPJICVbvqzjlbw==",
-      "license": "MIT",
-      "funding": {
-        "type": "opencollective",
-        "url": "https://opencollective.com/immer"
-      }
-    },
-    "node_modules/redux": {
-      "version": "5.0.1",
-      "resolved": "https://registry.npmjs.org/redux/-/redux-5.0.1.tgz",
-      "integrity": "sha512-M9/ELqF6fy8FwmkpnF0S3YKOqMyoWJ4+CS5Efg2ct3oY9daQvd/Pc71FpGZsVsbl3Cpb+IIcjBDUnnyBdQbq4w==",
-      "license": "MIT"
-    },
-    "node_modules/redux-thunk": {
-      "version": "3.1.0",
-      "resolved": "https://registry.npmjs.org/redux-thunk/-/redux-thunk-3.1.0.tgz",
-      "integrity": "sha512-NW2r5T6ksUKXCabzhL9z+h206HQw/NJkcLm1GPImRQ8IzfXwRGqjVhKJGauHirT0DAuyy6hjdnMZaRoAcy0Klw==",
-      "license": "MIT",
-      "peerDependencies": {
-        "redux": "^5.0.0"
-      }
-    },
     "node_modules/reflect.getprototypeof": {
       "version": "1.0.6",
       "resolved": "https://registry.npmjs.org/reflect.getprototypeof/-/reflect.getprototypeof-1.0.6.tgz",
@@ -7436,12 +7415,6 @@
       "engines": {
         "node": ">=0.10.0"
       }
-    },
-    "node_modules/reselect": {
-      "version": "5.1.1",
-      "resolved": "https://registry.npmjs.org/reselect/-/reselect-5.1.1.tgz",
-      "integrity": "sha512-K/BG6eIky/SBpzfHZv/dd+9JBFiS4SWV7FIujVyJRux6e45+73RaUHXLmIR1f7WOMaQ0U1km6qwklRQxpJJY0w==",
-      "license": "MIT"
     },
     "node_modules/resolve": {
       "version": "2.0.0-next.5",
@@ -8209,12 +8182,6 @@
         "node": ">=0.8"
       }
     },
-    "node_modules/tiny-invariant": {
-      "version": "1.3.3",
-      "resolved": "https://registry.npmjs.org/tiny-invariant/-/tiny-invariant-1.3.3.tgz",
-      "integrity": "sha512-+FbBPE1o9QAYvviau/qC5SE3caw21q3xkvWKBtja5vgqOWIHHJ3ioaq1VPfn/Szqctz2bU/oYeKd9/z5BL+PVg==",
-      "license": "MIT"
-    },
     "node_modules/tinyglobby": {
       "version": "0.2.15",
       "resolved": "https://registry.npmjs.org/tinyglobby/-/tinyglobby-0.2.15.tgz",
@@ -8470,15 +8437,6 @@
         "punycode": "^2.1.0"
       }
     },
-    "node_modules/use-sync-external-store": {
-      "version": "1.6.0",
-      "resolved": "https://registry.npmjs.org/use-sync-external-store/-/use-sync-external-store-1.6.0.tgz",
-      "integrity": "sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w==",
-      "license": "MIT",
-      "peerDependencies": {
-        "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
-      }
-    },
     "node_modules/util-deprecate": {
       "version": "1.0.2",
       "resolved": "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz",
@@ -8500,28 +8458,6 @@
       "integrity": "sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==",
       "engines": {
         "node": ">= 0.8"
-      }
-    },
-    "node_modules/victory-vendor": {
-      "version": "37.3.6",
-      "resolved": "https://registry.npmjs.org/victory-vendor/-/victory-vendor-37.3.6.tgz",
-      "integrity": "sha512-SbPDPdDBYp+5MJHhBCAyI7wKM3d5ivekigc2Dk2s7pgbZ9wIgIBYGVw4zGHBml/qTFbexrofXW6Gu4noGxrOwQ==",
-      "license": "MIT AND ISC",
-      "dependencies": {
-        "@types/d3-array": "^3.0.3",
-        "@types/d3-ease": "^3.0.0",
-        "@types/d3-interpolate": "^3.0.1",
-        "@types/d3-scale": "^4.0.2",
-        "@types/d3-shape": "^3.1.0",
-        "@types/d3-time": "^3.0.0",
-        "@types/d3-timer": "^3.0.0",
-        "d3-array": "^3.1.6",
-        "d3-ease": "^3.0.1",
-        "d3-interpolate": "^3.0.1",
-        "d3-scale": "^4.0.2",
-        "d3-shape": "^3.1.0",
-        "d3-time": "^3.0.0",
-        "d3-timer": "^3.0.1"
       }
     },
     "node_modules/vite": {
@@ -8996,3 +8932,3539 @@
     }
   }
 }
+
+
+--- END OF FILE: package-lock.json ---
+
+================================================================================
+
+
+--- START OF FILE: package.json ---
+
+{
+  "name": "smart-quran-institute",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emailjs/browser": "^4.4.1",
+    "@react-email/components": "^1.0.4",
+    "@sendgrid/mail": "^8.1.4",
+    "@tehw0lf/contact-form": "^0.21.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "emailjs-com": "^3.2.0",
+    "express": "^4.21.1",
+    "firebase": "^11.0.1",
+    "framer-motion": "^11.11.11",
+    "lucide-react": "^0.563.0",
+    "nodemailer": "^7.0.12",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.3.0",
+    "react-intersection-observer": "^9.13.1",
+    "react-phone-input-2": "^2.15.1",
+    "react-router-dom": "^6.27.0",
+    "sonner": "^2.0.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.11.1",
+    "@types/react": "^18.3.10",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.2",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.11.1",
+    "eslint-plugin-react": "^7.37.0",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.12",
+    "globals": "^15.9.0",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "vite": "^7.3.1"
+  },
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "main": "eslint.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+
+
+--- END OF FILE: package.json ---
+
+================================================================================
+
+
+--- START OF FILE: postcss.config.js ---
+
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+
+--- END OF FILE: postcss.config.js ---
+
+================================================================================
+
+
+--- START OF FILE: tailwind.config.js ---
+
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+
+
+--- END OF FILE: tailwind.config.js ---
+
+================================================================================
+
+
+--- START OF FILE: txt-to-code.py ---
+
+import os
+import re
+import argparse
+
+def recreate_project_from_file(input_file_path, output_dir):
+    """
+    Reads a combined project text file and recreates the directory
+    and file structure.
+    """
+    print("--- PROJECT RECREATION SCRIPT STARTING ---")
+    
+    # Step 1: Safety check and create the main output directory
+    if os.path.exists(output_dir):
+        print(f"Error: Output directory '{output_dir}' already exists.")
+        print("Please remove it or choose a different name to avoid overwriting data.")
+        return
+        
+    print(f"Creating project in new directory: '{output_dir}'")
+    os.makedirs(output_dir)
+
+    # Step 2: Read the entire content of the combined file
+    try:
+        with open(input_file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+    except FileNotFoundError:
+        print(f"Error: Input file '{input_file_path}' not found.")
+        return
+
+    # Step 3: Use regex to find all file blocks
+    # This pattern is robust and finds the path and content for each file.
+    # re.DOTALL allows '.' to match newline characters.
+    file_pattern = re.compile(
+        r"--- START OF FILE: (.*?) ---\n\n(.*?)\n\n--- END OF FILE: \1 ---",
+        re.DOTALL
+    )
+
+    files_created = 0
+    matches = file_pattern.finditer(content)
+    
+    for match in matches:
+        # Extract the relative path and the file's content from the match
+        relative_path = match.group(1).strip()
+        file_content = match.group(2)
+
+        # Normalize path separators for the current operating system (e.g., / becomes \)
+        normalized_path = os.path.normpath(relative_path)
+        full_path = os.path.join(output_dir, normalized_path)
+
+        try:
+            # Step 4: Create the necessary parent directories for the file
+            directory = os.path.dirname(full_path)
+            if directory:
+                os.makedirs(directory, exist_ok=True)
+
+            # Step 5: Write the content to the new file
+            with open(full_path, 'w', encoding='utf-8') as new_file:
+                new_file.write(file_content)
+            
+            print(f"  [OK] Created: {full_path}")
+            files_created += 1
+
+        except Exception as e:
+            print(f"  [ERROR] Failed to create file {full_path}: {e}")
+
+    if files_created > 0:
+        print(f"\nSuccessfully recreated {files_created} files.")
+        print("--- SCRIPT FINISHED ---")
+    else:
+        print("\nNo files were found in the input file to recreate.")
+        print("--- SCRIPT FINISHED ---")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Recreate a project structure from a combined text file."
+    )
+    parser.add_argument(
+        "input_file", 
+        type=str, 
+        help="The path to the combined project text file (e.g., combined_project_code.txt)."
+    )
+    parser.add_argument(
+        "output_directory", 
+        type=str, 
+        help="The name of the new directory where the project will be recreated."
+    )
+    
+    args = parser.parse_args()
+    
+    recreate_project_from_file(args.input_file, args.output_directory)
+
+if __name__ == "__main__":
+    main()
+
+--- END OF FILE: txt-to-code.py ---
+
+================================================================================
+
+
+--- START OF FILE: vite.config.js ---
+
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+})
+
+
+--- END OF FILE: vite.config.js ---
+
+================================================================================
+
+└── public/
+└── src/
+        ├── App.css
+        ├── App.jsx
+        ├── WhatsAppIcon.jsx
+        ├── index.css
+        ├── main.jsx
+        ├── server.js
+
+--- START OF FILE: src\App.css ---
+
+body {
+  overflow-x: hidden;
+}
+.react-tel-input .form-control{
+  border: none !important;
+}
+
+--- END OF FILE: src\App.css ---
+
+================================================================================
+
+
+--- START OF FILE: src\App.jsx ---
+
+import React from 'react';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import Navbar from './Components/Navbar';
+import About from './Pages/AboutUs';
+import ContactUs from './Pages/ContactUs/ContactUs';
+import Courses from './Pages/Courses';
+import FAQs from './Pages/FAQs/FAQs';
+import Home from './Pages/Home';
+import Pricing from './Pages/Pricing/Pricing';
+import { Toaster } from 'sonner';
+// import Modal from './Components/Modal';
+
+import './App.css';
+function App() {
+  return (
+    <Router>
+      {/* Navbar will be present on all pages */}
+      <Navbar />
+
+      {/* Define routes for each page */}
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/about' element={<About />} />
+        <Route path='/courses' element={<Courses />} />
+        <Route path='/pricing' element={<Pricing />} />
+        <Route path='/contact' element={<ContactUs />} />
+        <Route path='/faqs' element={<FAQs />} />
+        {/* <Route path="/inputmodal" element={<Modal/>} /> */}
+        {/* <Route path='/blogs' element={<Blogs />} /> */}
+      </Routes>
+
+      {/* Sonner Toast Provider - positioned at bottom right with Poppins font */}
+      <Toaster
+        position="bottom-right"
+        richColors={true}
+        toastOptions={{
+          style: {
+            fontFamily: 'Poppins, sans-serif',
+          }
+        }}
+      />
+    </Router>
+  );
+}
+
+export default App;
+
+
+--- END OF FILE: src\App.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\WhatsAppIcon.jsx ---
+
+// WhatsAppIcon.jsx
+import { motion } from 'framer-motion';
+
+const WhatsAppIcon = () => {
+  return (
+    <motion.div
+      className='fixed bottom-5 left-5 z-50'
+      initial={{ y: 0 }}
+      animate={{ y: [0, -10, 0] }}
+      transition={{
+        duration: 1.5,
+        ease: 'easeInOut',
+        repeat: Infinity,
+        repeatType: 'loop',
+      }}
+    >
+      <a
+        href='https://wa.me/923132661982?text='
+        target='_blank'
+        rel='noopener noreferrer'
+      >
+        <img src='whtsap-left.svg' className='w-[50%] h-[50%] md:w-[70%] md:h-[70%]' alt='WhatsApp Icon' />
+      </a>
+    </motion.div>
+  );
+};
+
+export default WhatsAppIcon;
+
+
+--- END OF FILE: src\WhatsAppIcon.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\index.css ---
+
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body{
+    font-family: "Poppins", sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.Pricing {
+    background-image: url("/Frame 1261153745.png");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.phone-dropdown {
+    position: absolute !important;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 50;
+    /* Ensures it appears above other elements */
+}
+
+--- END OF FILE: src\index.css ---
+
+================================================================================
+
+
+--- START OF FILE: src\main.jsx ---
+
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App.jsx';
+import './index.css';
+import WhatsAppIcon from './WhatsAppIcon';
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <WhatsAppIcon />
+    <App />
+  </StrictMode>
+);
+
+
+--- END OF FILE: src\main.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\server.js ---
+
+// server.js
+require("dotenv").config();
+const express = require("express");
+const nodemailer = require("nodemailer");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+
+app.post("/send-email", async (req, res) => {
+  const { name, phone, email, course } = req.body;
+
+  // Nodemailer transporter setup
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL,
+      pass: process.env.PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL,
+    to: email,
+    subject: "Free Trial Registration",
+    text: `Name: ${name}\nPhone: ${phone}\nCourse: ${course}`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.status(200).send("Email sent successfully");
+  } catch (error) {
+    console.error("Error sending email:", error);
+    res.status(500).send("Failed to send email");
+  }
+});
+
+app.listen(5000, () => console.log("Server running on port 5000"));
+
+
+--- END OF FILE: src\server.js ---
+
+================================================================================
+
+    └── Components/
+            ├── AuthModal.jsx
+            ├── BankDetailsModal.jsx
+            ├── Footer.jsx
+            ├── LastFooter.jsx
+            ├── Modal.jsx
+            ├── Navbar.jsx
+            ├── PaymentModal.jsx
+
+--- START OF FILE: src\Components\AuthModal.jsx ---
+
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
+import {
+  Mail,
+  Lock,
+  User,
+  Phone,
+  Eye,
+  EyeOff,
+  BookOpen, // Added for the course icon
+} from "lucide-react";
+import { BsGenderAmbiguous } from "react-icons/bs";
+
+// List of courses from the images
+const COURSES = [
+  "Qaida with Tajweed",
+  "Quran With Tajweed",
+  "Quran Memorization (HIFZ)",
+  "Quran English Translation",
+  "Taleem ul Islam in English",
+  "Quran Urdu Tafseer",
+  "Ghusl Wudhu Salah in English",
+  "40 Hadiths in English for Kids with stories",
+  "Respectful children in Islam",
+  "Essential Dua's for kids",
+];
+
+export default function AuthModal({ isOpen, onClose }) {
+  const [activeTab, setActiveTab] = useState("login");
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+      >
+        <motion.div
+          onClick={(e) => e.stopPropagation()}
+          className="bg-white w-full max-w-xl rounded-3xl p-6 relative"
+          initial={{ scale: 0.85, y: 40 }}
+          animate={{ scale: 1, y: 0 }}
+          exit={{ scale: 0.85, y: 40 }}
+        >
+          {/* Close */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-xl font-bold"
+          >
+            ✕
+          </button>
+
+          {/* Tabs */}
+          <div className="flex justify-center gap-2 mb-6">
+            {["login", "register", "trial"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition ${activeTab === tab
+                  ? "bg-[#1C8E5A] text-white"
+                  : "bg-gray-100 text-gray-600"
+                  }`}
+              >
+                {tab === "login"
+                  ? "Login"
+                  : tab === "register"
+                    ? "Register"
+                    : "Free Trial"}
+              </button>
+            ))}
+          </div>
+
+          {/* CONTENT */}
+          {activeTab === "login" && <LoginForm />}
+          {activeTab === "register" && <RegisterForm />}
+          {activeTab === "trial" && <TrialForm />}
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+/* ================= INPUT & SELECT ================= */
+
+function Input({
+  placeholder,
+  type = "text",
+  icon: Icon,
+  isPassword = false,
+}) {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div className="relative">
+      {/* Left Icon */}
+      {Icon && (
+        <Icon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+      )}
+
+      <input
+        type={isPassword && show ? "text" : type}
+        placeholder={placeholder}
+        className={`w-full p-3 ${Icon ? "pl-12" : ""
+          } ${isPassword ? "pr-12" : ""}
+        rounded-xl border outline-none focus:border-[#1C8E5A]`}
+      />
+
+      {/* Eye Toggle */}
+      {isPassword && (
+        <button
+          type="button"
+          onClick={() => setShow(!show)}
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+        >
+          {show ? <Eye size={20} /> : <EyeOff size={20} />}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// New Select component for courses
+function Select({ icon: Icon, options, placeholder }) {
+  return (
+    <div className="relative">
+      {Icon && (
+        <Icon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+      )}
+      <select
+        className={`w-full p-3 ${Icon ? "pl-12" : ""} rounded-xl border outline-none focus:border-[#1C8E5A] bg-white appearance-none cursor-pointer`}
+        defaultValue=""
+      >
+        <option value="" disabled>{placeholder}</option>
+        {options.map((course, index) => (
+          <option key={index} value={course}>
+            {course}
+          </option>
+        ))}
+      </select>
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+/* ================= FORMS ================= */
+
+function LoginForm() {
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold text-center">Welcome Back</h2>
+
+      <Input placeholder="Email" icon={Mail} />
+      <Input
+        placeholder="Password"
+        type="password"
+        icon={Lock}
+        isPassword
+      />
+
+      <button className="w-full py-3 bg-[#FFD050] font-semibold rounded-xl">
+        Login
+      </button>
+    </div>
+  );
+}
+
+function RegisterForm() {
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold text-center">Create Account</h2>
+
+      <Input placeholder="Full Name" icon={User} />
+      <Input placeholder="Email" icon={Mail} />
+      <Input
+        placeholder="Password"
+        type="password"
+        icon={Lock}
+        isPassword
+      />
+      <Input placeholder="Gender" icon={BsGenderAmbiguous} />
+      <Input placeholder="WhatsApp Number" icon={Phone} />
+      {/* Course Dropdown Added Here */}
+      <Select icon={BookOpen} options={COURSES} placeholder="Select Course" />
+
+      <button className="w-full py-3 bg-[#1C8E5A] text-white font-semibold rounded-xl">
+        Register
+      </button>
+    </div>
+  );
+}
+
+function TrialForm() {
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold text-center">
+        Book 3 Days Free Trial
+      </h2>
+
+      <Input placeholder="Full Name" icon={User} />
+      <Input placeholder="Email" icon={Mail} />
+      <Input placeholder="Password" icon={Lock} type="password" isPassword />
+      <Input placeholder="Gender" icon={BsGenderAmbiguous} />
+      <Input placeholder="WhatsApp Number" icon={Phone} />
+      {/* Course Dropdown Added Here */}
+      <Select icon={BookOpen} options={COURSES} placeholder="Select Course" />
+
+      <button className="w-full py-3 bg-[#1C8E5A] text-white font-semibold rounded-xl">
+        Start Free Trial
+      </button>
+    </div>
+  );
+}
+
+--- END OF FILE: src\Components\AuthModal.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Components\BankDetailsModal.jsx ---
+
+import React, { useState, useEffect } from 'react'; // Added useEffect
+import { motion, AnimatePresence } from 'framer-motion';
+import { User, Phone, Mail, Lock, Landmark, CreditCard } from 'lucide-react';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+
+const BankDetailsModal = ({ isOpen, onClose, plan, onConfirm }) => {
+  const [selectedGender, setSelectedGender] = useState('Male');
+
+  // PREVENT BACKGROUND SCROLL
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    // Cleanup when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[150] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" // Removed overflow-y-auto from here
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.9, y: 20 }}
+          animate={{ scale: 1, y: 0 }}
+          exit={{ scale: 0.9, y: 20 }}
+          // ADDED: max-h-[90vh] and overflow-y-auto to enable internal scroll
+          className="bg-white w-full max-w-2xl px-4 pt-2 pb-6 md:px-6 relative shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Close button - Fixed at top right of the modal card */}
+          <button
+            onClick={onClose}
+            className="sticky top-0 float-right text-2xl font-bold text-gray-400 hover:text-black z-50 bg-white rounded-full p-1"
+          >
+            ✕
+          </button>
+
+          <div className="text-center mb-6 clear-both">
+            <h2 className="text-2xl font-bold text-[#1C8E5A]">Direct Admission</h2>
+            <p className="text-gray-500 mt-1">Plan: <span className="text-[#1C8E5A] font-bold">{plan?.title} ({plan?.frequency})</span></p>
+            <p className="text-xs text-red-500 mt-1">*Note: Direct payment is required for this plan. No free trial.</p>
+          </div>
+
+          <div className="space-y-4">
+            {/* Registration Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="relative flex items-center bg-gray-50 p-3 rounded-2xl border">
+                <User className="text-gray-400 w-5 h-5 mr-3" />
+                <input type="text" placeholder="Full Name" className="bg-transparent w-full outline-none text-black" />
+              </div>
+              <div className="relative rounded-2xl border overflow-hidden">
+                <PhoneInput
+                  country={'gb'}
+                  inputStyle={{ width: '100%', height: '48px', border: 'none', background: '#f9fafb' }}
+                  buttonStyle={{ border: 'none', background: '#f9fafb' }}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="relative flex items-center bg-gray-50 p-3 rounded-2xl border">
+                <Mail className="text-gray-400 w-5 h-5 mr-3" />
+                <input type="email" placeholder="Email Address" className="bg-transparent w-full outline-none text-black" />
+              </div>
+              <div className="relative flex items-center bg-gray-50 p-3 rounded-2xl border">
+                <Lock className="text-gray-400 w-5 h-5 mr-3" />
+                <input type="password" placeholder="Create Password" className="bg-transparent w-full outline-none text-black" />
+              </div>
+            </div>
+
+            {/* Gender Selection */}
+            <div className='flex items-center gap-6 justify-center py-2'>
+              <label className={`flex items-center gap-2 cursor-pointer ${selectedGender === 'Male' ? 'text-[#1C8E5A]' : 'text-gray-400'}`}>
+                <input type='radio' checked={selectedGender === 'Male'} onChange={() => setSelectedGender('Male')} className="accent-[#1C8E5A]" />
+                <span className="font-semibold">Male</span>
+              </label>
+              <label className={`flex items-center gap-2 cursor-pointer ${selectedGender === 'Female' ? 'text-[#1C8E5A]' : 'text-gray-400'}`}>
+                <input type='radio' checked={selectedGender === 'Female'} onChange={() => setSelectedGender('Female')} className="accent-[#1C8E5A]" />
+                <span className="font-semibold">Female</span>
+              </label>
+            </div>
+
+            {/* Bank Details Section */}
+            <div className="bg-[#FFF6E0] p-5 rounded-3xl border-2 border-dashed border-[#FFD050]">
+              <h4 className="font-bold flex items-center gap-2 mb-3 text-[#1A1A1A]"><Landmark size={20} /> Bank Transfer Details</h4>
+              <div className="grid grid-cols-1 text-sm gap-2">
+                <p><strong>Bank Name:</strong> Bank Al Habib</p>
+                <p><strong>Account Title:</strong> Shama Jahan</p>
+                <p><strong>Account Number:</strong> 1375-1872-0273-7001-5</p>
+                <p><strong>IBAN:</strong> PK67 BAHL 1375 1872 0273 7001</p>
+                <p><strong>Swift Code</strong> BAHLPKKA</p>
+              </div>
+            </div>
+
+            <p className="text-center text-sm text-gray-500">
+              Already have an account or already paid? <button className="text-[#1C8E5A] font-bold underline">Login here</button>
+            </p>
+
+            <button
+              onClick={onConfirm}
+              className="w-full bg-[#1C8E5A] text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-[#167a4d] transition-all flex items-center justify-center gap-2"
+            >
+              <CreditCard size={20} /> Confirm Payment & Enroll
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* Optional: Add this CSS to your global styles for a cleaner scrollbar */}
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #d1d5db;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #1C8E5A;
+        }
+      `}</style>
+    </AnimatePresence>
+  );
+};
+
+export default BankDetailsModal;
+
+--- END OF FILE: src\Components\BankDetailsModal.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Components\Footer.jsx ---
+
+import emailjs from 'emailjs-com'; // Import Email.js
+import { motion, useAnimation } from 'framer-motion';
+import React, { useState } from 'react';
+import { useInView } from 'react-intersection-observer';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+import LastFooter from './LastFooter';
+import { LockIcon, BookOpen } from 'lucide-react'; // Added BookOpen icon
+import { toast } from 'sonner';
+
+// Course options extracted from your images
+const COURSES = [
+  "Qaida with Tajweed",
+  "Quran With Tajweed",
+  "Quran Memorization (HIFZ)",
+  "Quran English Translation",
+  "Taleem ul Islam in English",
+  "Quran Urdu Tafseer",
+  "Ghusl Wudhu Salah in English",
+  "40 Hadiths in English for Kids with stories",
+  "Respectful children in Islam",
+  "Essential Dua's for kids",
+];
+
+function Footer() {
+  const [selectedOption, setSelectedOption] = useState('Male');
+  const [input1, setInput1] = useState(''); // Name
+  const [input2, setInput2] = useState(''); // Phone
+  const [input3, setInput3] = useState(''); // Email
+  const [input5, setInput5] = useState(''); // Password
+  const [input4, setInput4] = useState(''); // Message
+  const [course, setCourse] = useState(''); // New state for course
+
+  const controls = useAnimation();
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.2 });
+
+  if (inView) {
+    controls.start('visible');
+  }
+
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: 'easeOut' },
+    },
+  };
+
+  const handleEnrollNowClick = () => {
+    // Define the email template parameters
+    const templateParams = {
+      to_name: 'Admin', // Replace with the admin name or email if needed
+      from_name: input1, // User's name
+      user_email: input3, // User's email
+      user_mobile: input2, // User's mobile number
+      user_message: input4, // User's message
+      selected_course: course, // Added course to email params
+      name: input1,
+      mobile: input2,
+      email: input3,
+      message: input4,
+      course: course, // Added course to email params
+    };
+
+    // Send the email
+    emailjs
+      .send(
+        'service_a684mqv', // Replace with your Email.js service ID
+        'template_x3m5vdh', // Replace with your Email.js template ID
+        templateParams,
+        'R7RzaQFicwRxMNsAH' // Replace with your Email.js user ID
+      )
+      .then(
+        result => {
+          console.log('Email sent successfully:', result.text);
+          toast.success('Email sent successfully!');
+        },
+        error => {
+          console.error('Error sending email:', error);
+          toast.error('Failed to send the email, please try again.');
+        }
+      );
+  };
+
+  return (
+    <motion.section
+      className='bg-[#1C8E5A] mt-10'
+      ref={ref}
+      variants={sectionVariants}
+      initial='hidden'
+      animate={controls}
+    >
+      <div className='grid grid-cols-1 md:grid-cols-12 gap-6 bg-[#1C8E5A] overflow-hidden'>
+        {/* Left Section with Logo and Text */}
+        <motion.div
+          className='col-span-12 md:col-span-4 mt-10 flex flex-col gap-4 justify-center items-start'
+          variants={sectionVariants}
+        >
+          <img
+            src='/FooterLogo2.png'
+            alt='Footer Logo'
+            className='mb-4 sm:px-4 px-3'
+          />
+          <p className='font-normal text-base text-[#FFFFFF] mb-4 sm:px-4 px-3'>
+            The Islamic Global Institute, we are dedicated to offering students
+            around the globe a profound understanding of the Holy Quran. Our
+            qualified tutors possess authentic degrees and Ijazah certificates.
+          </p>
+          <div className='absolute bottom-[-0px]'>
+            <img src='/Vector.png' alt='Vector Image' />
+          </div>
+        </motion.div>
+
+        {/* Form Section */}
+        <motion.div
+          className='col-span-12 p-4 md:col-span-5 flex flex-col gap-4 justify-center text-white'
+          variants={sectionVariants}
+        >
+          <h1 className='text-[#FFFFFF] font-semibold text-xl mb-2 md:mb-4 text-center'>
+            Book 3 Days Free Trial
+          </h1>
+
+          {/* Gender Selection */}
+          <div className='flex items-center gap-4 justify-center'>
+            <label
+              className={`flex items-center gap-2 ${selectedOption === 'Male' ? 'text-[#FFD050]' : 'text-[#9F9F9F]'
+                }`}
+            >
+              <input
+                type='radio'
+                value='Male'
+                checked={selectedOption === 'Male'}
+                onChange={() => setSelectedOption('Male')}
+                className={`form-radio w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 ${selectedOption === 'Male'
+                    ? 'border-[#FFD050]'
+                    : 'border-transparent'
+                  } accent-[#FFD050]`}
+              />
+              <span>Male</span>
+            </label>
+            <label
+              className={`flex items-center gap-2 ${selectedOption === 'Female'
+                  ? 'text-[#FFD050]'
+                  : 'text-[#9F9F9F]'
+                }`}
+            >
+              <input
+                type='radio'
+                value='Female'
+                checked={selectedOption === 'Female'}
+                onChange={() => setSelectedOption('Female')}
+                className={`form-radio w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 ${selectedOption === 'Female'
+                    ? 'border-[#FFD050]'
+                    : 'border-transparent'
+                  } accent-[#FFD050]`}
+              />
+              <span>Female</span>
+            </label>
+          </div>
+
+          {/* Input Fields */}
+          <div className='flex flex-col gap-y-4 mt-4'>
+            <div className='flex flex-col md:flex-row gap-4'>
+              <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
+                <img src='/solar_user-linear.png' alt='' />
+                <hr className='h-7 border-[#9F9F9F] border mx-2' />
+                <input
+                  type='text'
+                  value={input1}
+                  onChange={e => setInput1(e.target.value)}
+                  placeholder='Name'
+                  className='p-1 rounded-3xl text-black w-full outline-transparent'
+                />
+              </div>
+
+              <div className='flex items-center overflow-hidden bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
+                <PhoneInput
+                  country={'gb'}
+                  value={input2}
+                  onChange={phone => setInput2(phone)}
+                  enableSearch
+                  inputClass='text-black rounded-3xl outline-transparent w-full border-none'
+                  buttonClass='rounded-3xl border-none'
+                  dropdownClass='text-black bg-white rounded-3xl shadow-lg border border-gray-300 max-h-56 overflow-y-auto'
+                  className='flex w-full items-center rounded-3xl border-none'
+                />
+              </div>
+            </div>
+
+            <div className='flex flex-col md:flex-row gap-4'>
+              <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
+                <img src='Frame 33.svg' alt='' />
+                <hr className='h-7 border-[#9F9F9F] border mx-2' />
+                <input
+                  type='text'
+                  value={input3}
+                  onChange={e => setInput3(e.target.value)}
+                  placeholder='Email'
+                  className='p-1 rounded-3xl text-black w-full outline-transparent'
+                />
+              </div>
+
+              <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
+                <LockIcon className='text-gray-400' />
+                <hr className='h-7 border-[#9F9F9F] border mx-2' />
+                <input
+                  type='password'
+                  value={input5}
+                  onChange={e => setInput5(e.target.value)}
+                  placeholder='Password'
+                  className='p-1 rounded-3xl text-black w-full outline-transparent'
+                />
+              </div>
+            </div>
+
+            {/* Added Course Dropdown Row */}
+            <div className='flex items-center bg-white p-1 ps-3 w-full rounded-3xl'>
+              <BookOpen className='text-gray-400 w-5 h-5' />
+              <hr className='h-7 border-[#9F9F9F] border mx-2' />
+              <select
+                value={course}
+                onChange={e => setCourse(e.target.value)}
+                className='p-[6px] rounded-3xl text-black w-full outline-transparent bg-white cursor-pointer appearance-none'
+              >
+                <option value="" disabled>Select Course</option>
+                {COURSES.map((item, idx) => (
+                  <option key={idx} value={item}>{item}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className='flex items-center bg-white p-1 ps-3 w-full rounded-3xl relative'>
+              <input
+                type='text'
+                value={input4}
+                onChange={e => setInput4(e.target.value)}
+                placeholder='Message'
+                className='p-[6px] ps-1 rounded-3xl text-black w-full outline-transparent'
+              />
+            </div>
+          </div>
+
+          {/* Enroll Button */}
+          <motion.div
+            className='flex justify-center mt-6 md:mt-2'
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <button
+              onClick={handleEnrollNowClick}
+              className='bg-[#FFD050] font-bold py-2 px-4 rounded-full hover:bg-yellow-400 w-full text-black transition-all duration-300'
+            >
+              Enroll Now
+            </button>
+          </motion.div>
+        </motion.div>
+
+        {/* Location Section with Icons */}
+        <motion.div
+          className='col-span-12 md:col-span-3 my-auto px-4 md:px-0 text-white text-sm sm:text-base space-y-4'
+          variants={sectionVariants}
+        >
+          <motion.div className='flex items-center' whileHover={{ x: 5 }}>
+            <img
+              src='/footerlocation-icon.svg'
+              alt='Location Icon'
+              className='w-6 h-6 mr-2'
+            />
+            <p>H no R-107 Gulistan e Malir, Shah Faisal, Karachi, Pakistan</p>
+          </motion.div>
+          <motion.div className='flex items-center' whileHover={{ x: 5 }}>
+            <img
+              src='/footerphone-icon.svg'
+              alt='Phone Icon'
+              className='w-6 h-6 mr-2'
+            />
+            <p>+92 3132661982</p>
+          </motion.div>
+          <motion.div className='flex items-center' whileHover={{ x: 5 }}>
+            <img
+              src='/footeremail-icon.svg'
+              alt='Email Icon'
+              className='w-6 h-6 mr-2'
+            />
+            <p>theislamicglobalinstitute456@gmail.com</p>
+          </motion.div>
+          <motion.div className='flex items-center' whileHover={{ x: 5 }}>
+            <img
+              src='/footerhours-icon.svg'
+              alt='Working Hours Icon'
+              className='w-6 h-6 mr-2'
+            />
+            <p>Available 24/7 to answer your queries</p>
+          </motion.div>
+        </motion.div>
+      </div>
+      <LastFooter />
+    </motion.section>
+  );
+}
+
+export default Footer;
+
+--- END OF FILE: src\Components\Footer.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Components\LastFooter.jsx ---
+
+import { motion } from 'framer-motion';
+import React from 'react';
+
+function LastFooter() {
+  return (
+    <motion.section
+      className='px-5 py-3 bg-[#1C8E5A]' // Background color for visibility
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+    >
+      <div className='flex flex-col md:flex-row  justify-between items-center gap-4 text-white'>
+        {/* Text Section */}
+        <div>
+          <div className='text-center md:text-left'>
+            <h3 className='text-sm md:text-base'>
+              © 2026 Al Islamic Global Institute
+            </h3>
+          </div>
+        </div>
+        <div className='flex gap-4'>
+          {/* Social Media Links */}
+          <div className='flex gap-4'>
+            <a
+              href='http://youtube.com/channel/UCuIPXx106-Ifvq6VD3ecJ4A'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <img
+                src='/youtube_lastfooter.svg'
+                className='w-8 md:w-10'
+                alt='YouTube'
+              />
+            </a>
+            <a
+              href='https://join.skype.com/invite/BOf0VvMKyAVe'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <img
+                src='/skype_lastfooter.svg'
+                className='w-8 md:w-10'
+                alt='Skype'
+              />
+            </a>
+            <a
+              href='https://www.instagram.com/alquran.digital.institute'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <img
+                src='/instagram-lastfooter.svg'
+                className='w-8 md:w-10'
+                alt='Instagram'
+              />
+            </a>
+            <a
+              href='https://www.facebook.com/profile.php?id=100083203658283'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <img
+                src='/facebook-lastfooter.svg'
+                className='w-8 md:w-10'
+                alt='Facebook'
+              />
+            </a>
+          </div>
+
+          {/* Payment Logos */}
+          <div className='flex  gap-3'>
+            <img
+              src='/logos_mastercard.png'
+              className='w-10 md:w-12'
+              alt='MasterCard'
+            />
+            <img
+              src='/Layer_1.png'
+              className='w-10 md:w-12'
+              alt='Payment Logo'
+            />
+          </div>
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
+export default LastFooter;
+
+
+--- END OF FILE: src\Components\LastFooter.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Components\Modal.jsx ---
+
+import emailjs from 'emailjs-com';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { FiAlertCircle } from 'react-icons/fi';
+import { LockIcon } from 'lucide-react';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+import { toast } from 'sonner';
+
+// Changed setIsOpen to onClose to match the prop passed from WhatweOffer
+const Modal = ({ isOpen, onClose, course }) => {
+  // State variables
+  const [selectedOption, setSelectedOption] = useState('');
+  const [input1, setInput1] = useState(''); // Name
+  const [input2, setInput2] = useState(''); // Phone
+  const [input3, setInput3] = useState(''); // Email
+  const [input5, setInput5] = useState(''); // Password
+  const [input4, setInput4] = useState(''); // Message
+
+  // Animation variants
+  const sectionVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.5 } },
+  };
+
+  const handleEnrollNowClick = () => {
+    const templateParams = {
+      to_name: 'Admin',
+      from_name: input1,
+      user_email: input3,
+      user_mobile: input2,
+      user_message: input4,
+      course_name: course?.title,
+      password: input5,
+    };
+
+    emailjs
+      .send(
+        'service_a684mqv',
+        'template_x3m5vdh',
+        templateParams,
+        'R7RzaQFicwRxMNsAH'
+      )
+      .then(response => {
+        console.log('Email sent successfully!', response.status, response.text);
+        toast.success('Email sent successfully!');
+      })
+      .catch(error => {
+        console.error('Failed to send email:', error);
+        toast.error('Failed to send email. Please try again.');
+      });
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose} // Changed to onClose
+          className='bg-slate-900/40 backdrop-blur p-8 fixed inset-0 z-[100] grid place-items-center overflow-y-scroll cursor-pointer'
+        >
+          <motion.div
+            initial={{ scale: 0, rotate: '12.5deg' }}
+            animate={{ scale: 1, rotate: '0deg' }}
+            exit={{ scale: 0, rotate: '0deg' }}
+            onClick={e => e.stopPropagation()}
+            className='bg-[#FFD050] p-6 rounded-3xl w-full max-w-2xl shadow-xl cursor-default relative overflow-hidden'
+          >
+            <FiAlertCircle className='text-white/10 rotate-12 text-[250px] absolute z-0 -top-24 -left-24 pointer-events-none' />
+
+            <div className='flex justify-end relative z-[60]'>
+              <button
+                onClick={onClose} // Changed to onClose
+                className="hover:scale-110 transition-transform p-1"
+              >
+                <img
+                  src='/si_close-duotone.svg'
+                  alt='close'
+                  className='w-8 h-8'
+                />
+              </button>
+            </div>
+
+            <div className='flex flex-col gap-4 justify-center text-white relative z-10'>
+              <motion.h1
+                className='text-gray-900 font-bold text-2xl text-center'
+                variants={sectionVariants}
+              >
+                Book <span className='text-[#1C8E5A]'>{course?.title}</span> 3 Days Free Trial
+              </motion.h1>
+
+              <motion.div
+                className='flex items-center gap-4 justify-center'
+                variants={sectionVariants}
+              >
+                <label className={`flex items-center gap-2 cursor-pointer font-medium ${selectedOption === 'Male' ? 'text-[#1C8E5A]' : 'text-gray-600'}`}>
+                  <input
+                    type='radio'
+                    value='Male'
+                    checked={selectedOption === 'Male'}
+                    onChange={() => setSelectedOption('Male')}
+                    className={`form-radio w-4 h-4 rounded-full border-2 ${selectedOption === 'Male' ? 'border-[#1C8E5A]' : 'border-transparent'} accent-[#1C8E5A]`}
+                  />
+                  <span>Male</span>
+                </label>
+                <label className={`flex items-center gap-2 cursor-pointer font-medium ${selectedOption === 'Female' ? 'text-[#1C8E5A]' : 'text-gray-600'}`}>
+                  <input
+                    type='radio'
+                    value='Female'
+                    checked={selectedOption === 'Female'}
+                    onChange={() => setSelectedOption('Female')}
+                    className={`form-radio w-4 h-4 rounded-full border-2 ${selectedOption === 'Female' ? 'border-[#1C8E5A]' : 'border-transparent'} accent-[#1C8E5A]`}
+                  />
+                  <span>Female</span>
+                </label>
+              </motion.div>
+
+              <motion.div className='flex flex-col gap-y-4 mt-4' variants={sectionVariants}>
+                <div className='flex flex-col md:flex-row gap-4'>
+                  <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
+                    <img src='/solar_user-linear.png' alt='' className="w-5" />
+                    <hr className='h-7 border-[#9F9F9F] border mx-2' />
+                    <input
+                      type='text'
+                      value={input1}
+                      onChange={e => setInput1(e.target.value)}
+                      placeholder='Name'
+                      className='p-1 rounded-3xl text-black w-full outline-transparent'
+                    />
+                  </div>
+                  <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
+                    <PhoneInput
+                      country={'gb'}
+                      value={input2}
+                      onChange={phone => setInput2(phone)}
+                      enableSearch
+                      inputClass='text-black rounded-3xl border-none'
+                      buttonClass='rounded-3xl border-none'
+                      dropdownClass='text-black bg-white rounded-3xl shadow-lg'
+                      className='flex w-full items-center rounded-3xl'
+                    />
+                  </div>
+                </div>
+
+                <div className='flex flex-col md:flex-row gap-4'>
+                  <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
+                    <img src='Frame 33.svg' alt='' className="w-5" />
+                    <hr className='h-7 border-[#9F9F9F] border mx-2' />
+                    <input
+                      type='email'
+                      value={input3}
+                      onChange={e => setInput3(e.target.value)}
+                      placeholder='Email'
+                      className='p-1 rounded-3xl text-black w-full outline-transparent'
+                    />
+                  </div>
+                  <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
+                    <LockIcon className='text-gray-400 w-5 h-5' />
+                    <hr className='h-7 border-[#9F9F9F] border mx-2' />
+                    <input
+                      type='password'
+                      value={input5}
+                      onChange={e => setInput5(e.target.value)}
+                      placeholder='Password'
+                      className='p-1 rounded-3xl text-black w-full outline-transparent'
+                    />
+                  </div>
+                </div>
+
+                <div className='flex items-center bg-white p-1 ps-3 w-full rounded-3xl'>
+                  <input
+                    type='text'
+                    value={input4}
+                    onChange={e => setInput4(e.target.value)}
+                    placeholder='Message'
+                    className='p-[6px] ps-1 rounded-3xl text-black w-full outline-transparent'
+                  />
+                </div>
+              </motion.div>
+            </div>
+
+            <motion.div className='flex justify-center mt-6 relative z-10' variants={sectionVariants}>
+              <button
+                onClick={handleEnrollNowClick}
+                className='px-10 py-3 text-nowrap bg-[#1C8E5A] hover:bg-green-700 text-white font-bold rounded-3xl transition duration-300 w-full md:w-auto shadow-lg'
+              >
+                Start 3 Days Free Trial
+              </button>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
+export default Modal;
+
+--- END OF FILE: src\Components\Modal.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Components\Navbar.jsx ---
+
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useState } from "react";
+import { FaBars, FaTimes } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import AuthModal from "../Components/AuthModal";
+
+const navLinks = [
+  { title: "Home", url: "/" },
+  { title: "About Us", url: "/about" },
+  { title: "Courses", url: "/courses" },
+  { title: "Pricing", url: "/pricing" },
+  { title: "Contact Us", url: "/contact" },
+  { title: "FAQs", url: "/faqs" },
+];
+
+function Navbar() {
+  const [showMenu, setShowMenu] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [activeLink, setActiveLink] = useState("Home");
+
+  return (
+    <nav className="bg-white py-1 px-4 shadow-md sticky top-0 z-50">
+      <div className="container mx-auto flex justify-between items-center">
+        {/* Logo */}
+        <img src="/Logo (2).png" alt="Logo" className="w-24 h-16 object-cover" />
+
+        {/* Desktop Links */}
+        <ul className="hidden lg:flex space-x-6 items-center">
+          {navLinks.map((link) => (
+            <Link key={link.title} to={link.url}>
+              <li
+                onClick={() => {window.scrollTo(0,0) ;setActiveLink(link.title)}}
+                className={`text-sm transition ${
+                  activeLink === link.title
+                    ? "text-black font-semibold"
+                    : "text-gray-500"
+                }`}
+              >
+                {link.title}
+              </li>
+            </Link>
+          ))}
+        </ul>
+
+        {/* Auth Button */}
+        <button
+          onClick={() => setShowAuthModal(true)}
+          className="hidden lg:block bg-[#FFD050] px-4 py-2 font-semibold rounded-md"
+        >
+          Login / Register
+        </button>
+
+        {/* Mobile */}
+        <div className="lg:hidden">
+          <FaBars onClick={() => setShowMenu(true)} className="text-2xl" />
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {showMenu && (
+          <motion.div
+            className="fixed inset-0 bg-black/80 z-40 flex justify-center items-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <FaTimes
+              onClick={() => setShowMenu(false)}
+              className="absolute top-6 right-6 text-white text-2xl"
+            />
+
+            <div className="bg-white rounded-xl p-8 w-full max-w-sm">
+              <ul className="flex flex-col gap-6 items-center">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.title}
+                    to={link.url}
+                    onClick={() => {window.scrollTo(0,0) ;setShowMenu(false)}}
+                    className="text-xl text-gray-700"
+                  >
+                    {link.title}
+                  </Link>
+                ))}
+                <button
+                  onClick={() => {
+                    setShowMenu(false);
+                    setShowAuthModal(true);
+                  }}
+                  className="bg-[#FFD050] px-6 py-3 rounded-full font-semibold"
+                >
+                  Login / Register
+                </button>
+              </ul>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
+    </nav>
+  );
+}
+
+export default Navbar;
+
+
+--- END OF FILE: src\Components\Navbar.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Components\PaymentModal.jsx ---
+
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { toast } from 'sonner';
+
+const PaymentModal = ({ isOpen, setIsOpen, plan }) => {
+  const [transactionId, setTransactionId] = useState('');
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={() => setIsOpen(false)}
+      >
+        <motion.div
+          onClick={e => e.stopPropagation()}
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          className="bg-[#ECFEFB] rounded-3xl p-6 w-full max-w-5xl shadow-xl"
+        >
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-[#1A1A1A]">
+              Complete Your Payment
+            </h2>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-gray-500 text-xl hover:text-black"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Plan Info */}
+          {plan && (
+            <p className="text-center text-gray-600 mb-6">
+              Selected Plan: <span className="font-semibold">{plan.title}</span> ·{' '}
+              {plan.frequency}
+            </p>
+          )}
+
+          {/* Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* Card 1 */}
+            <div className="rounded-2xl p-6 text-white bg-gradient-to-br from-emerald-600 to-slate-700 shadow-lg">
+              <p className="text-sm opacity-80">BANK</p>
+              <p className="font-semibold text-lg mb-4">
+                Australian Humanity Support Limited
+              </p>
+
+              <div className="mb-6">
+                <p className="text-2xl font-bold tracking-widest">
+                  400 012 043
+                </p>
+              </div>
+
+              <div className="flex justify-between text-sm">
+                <div>
+                  <p className="opacity-80">Holder</p>
+                  <p className="font-medium">73-663-953-508</p>
+                </div>
+                <div>
+                  <p className="opacity-80">BSB</p>
+                  <p className="font-medium">112-879</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2 */}
+            <div className="rounded-2xl p-6 text-white bg-gradient-to-br from-teal-600 to-slate-700 shadow-lg">
+              <p className="text-sm opacity-80">BANK</p>
+              <p className="font-semibold text-lg mb-4">
+                AusPak Women Association Incorporated APWA
+              </p>
+
+              <div className="mb-6">
+                <p className="text-2xl font-bold tracking-widest">
+                  416 943 758
+                </p>
+              </div>
+
+              <div className="flex justify-between text-sm">
+                <div>
+                  <p className="opacity-80">Holder</p>
+                  <p className="font-medium">79-783-248-602</p>
+                </div>
+                <div>
+                  <p className="opacity-80">BSB</p>
+                  <p className="font-medium">112-879</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Transaction ID */}
+          <div className="max-w-md mx-auto">
+            <label className="block text-sm font-medium mb-1">
+              Transaction ID
+            </label>
+            <input
+              type="text"
+              value={transactionId}
+              onChange={e => setTransactionId(e.target.value)}
+              placeholder="Enter transaction ID"
+              className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-emerald-500 outline-none"
+            />
+
+            <button
+              disabled={!transactionId}
+              onClick={() => {
+                toast.success('Payment submitted successfully!');
+                setTransactionId('');
+                setIsOpen(false);
+              }}
+              className="w-full mt-4 py-3 rounded-full bg-[#1C8E5A] text-white font-semibold hover:bg-emerald-700 disabled:opacity-50"
+            >
+              Confirm Payment
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+export default PaymentModal;
+
+
+--- END OF FILE: src\Components\PaymentModal.jsx ---
+
+================================================================================
+
+    └── Pages/
+        └── AboutUs/
+                ├── About.jsx
+                ├── FreeTrail.jsx
+                ├── index.jsx
+
+--- START OF FILE: src\Pages\AboutUs\About.jsx ---
+
+import React from 'react';
+import FreeTrail from './FreeTrail';
+
+function About() {
+  const details = [
+    {
+      image: '/Frame 1261153708.png',
+      title: 'Free Trial Classes for All',
+      description:
+        'We offer years of expertise in teaching the Quran online for the sake of Allah. Try a free class anytime—register for Skype lessons or contact us for a consultation!',
+    },
+    {
+      image: '/Frame 1261153708.png',
+      title: 'Flexible Schedule',
+      description:
+        'Quran Online Academy offers high-quality Quran classes in an engaging digital setting, allowing you and your family to learn from home. Our tutors are available 24/7 to support your journey.',
+    },
+    {
+      image: '/Frame 1261153708.png',
+      title: 'One-to-One Classes',
+      description:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    },
+    {
+      image: '/Frame 1261153708.png',
+      title: 'Multilingual Teachers',
+      description:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    },
+  ];
+
+  return (
+    <>
+      <section>
+        <div className='relative flex flex-col md:flex-row justify-center items-center'>
+          {/* Image Container */}
+          <div className='w-full relative flex justify-center md:justify-end'>
+            <img
+              src='/Frame 1261153740.png'
+              alt='About-Us'
+              className='w-full h-auto object-cover'
+            />
+
+            {/* Text Overlay */}
+            <div className='absolute inset-0 flex flex-col justify-center items-start text-start px-4 md:px-16 mb-6'>
+              <h1 className='font-semibold text-3xl sm:text-4xl md:text-5xl xl:text-7xl text-[#1A1A1A]'>
+                About Us
+              </h1>
+              <p className='text-[#1A1A1A] text-lg sm:text-xl md:text-2xl font-medium mt-2 sm:mt-4'>
+                Islamic Global Institute
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className='grid grid-cols-1 md:grid-cols-12 pt-10 px-4 md:px-16 gap-8 md:gap-16 lg:gap-20 xl:gap-20 2xl:gap-20 '>
+          <div className='col-span-12 md:col-span-8'>
+            <h1 className='font-medium text-[#1C8E5A] text-3xl md:text-4xl'>
+              Islamic Global Institute
+            </h1>
+            <p className='font-normal text-base md:text-lg text-[#333333] mt-4 '>
+              Islamic Global Institute is dedicated to providing high-quality
+              Quranic education to students worldwide, emphasizing the profound
+              meanings and wisdom behind every holy word revealed by Allah.
+              Recognized globally for our outstanding online teaching standards
+              and comprehensive student support, our experienced tutors hold
+              authentic degrees and Ijazah certifications to ensure reliable and
+              knowledgeable instruction. We believe that Quranic knowledge has
+              the power to transform lives. For years, we've been committed to
+              making Quran education accessible to those who may lack
+              opportunities in their region, especially for learning with proper
+              Tajweed. Our mission is rooted in the concept of Sadqa-e-Jariah (a
+              form of ongoing charity) through the spread of true Islamic
+              knowledge. Our online Quran learning programs are structured to
+              cater to various needs and proficiency levels, from basic to
+              advanced courses in Tajweed, Tafseer, and memorization. Designed
+              for all age groups, we offer flexible learning options, including
+              both group and one-on-one sessions, ensuring that each student
+              receives personalized attention and a fulfilling learning
+              experience.
+            </p>
+          </div>
+          <div className='col-span-12 md:col-span-4 flex md:justify-end'>
+            <img src='/Group 9.png' alt='' className='max-w-full h-auto' />
+          </div>
+        </div>
+        <div className='pt-10 flex flex-col justify-center items-center gap-3 px-4 md:px-16'>
+          <h2 className='text-[#1C8E5A] text-lg md:text-xl text-center font-medium'>
+            Why Study with US
+          </h2>
+          <h1 className='font-medium text-xl md:text-2xl text-center'>
+          Islamic Global Institute
+          </h1>
+          <p className='text-[#333333] font-normal text-base md:text-lg lg:text-xl'>
+            We specialize in online Quran and Tajweed education, enabling you to
+            integrate learning into your everyday routine seamlessly. Our
+            innovative teaching approach offers an engaging and interactive
+            experience, allowing students to deeply connect with their studies.
+            With the support of our dedicated and knowledgeable tutors, you’ll
+            receive guidance and encouragement at every step of your learning
+            journey.
+          </p>
+        </div>
+
+        <div className='pt-12 grid grid-cols-1 md:grid-cols-4 gap-8 px-4 md:px-16'>
+          {details.map((item, index) => (
+            <div key={index} className='text-start'>
+              <img src={item.image} alt='img' className='' />
+              <h1 className='text-xl font-semibold mt-4'>{item.title}</h1>
+              <p className='mt-2 text-[#333333] text-start'>
+                {item.description}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div className='px-4 md:px-10'>
+          <FreeTrail />
+        </div>
+      </section>
+    </>
+  );
+}
+
+export default About;
+
+
+--- END OF FILE: src\Pages\AboutUs\About.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Pages\AboutUs\FreeTrail.jsx ---
+
+// FreeTrail.js
+import emailjs from 'emailjs-com'; // Import Email.js
+import { motion, useAnimation } from 'framer-motion';
+import { LockIcon, BookOpen } from 'lucide-react'; // Added BookOpen icon
+import React, { useState } from 'react';
+import { useInView } from 'react-intersection-observer';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+import { toast } from 'sonner';
+
+// Course options extracted from your images
+const COURSES = [
+  "Qaida with Tajweed",
+  "Quran With Tajweed",
+  "Quran Memorization (HIFZ)",
+  "Quran English Translation",
+  "Taleem ul Islam in English",
+  "Quran Urdu Tafseer",
+  "Ghusl Wudhu Salah in English",
+  "40 Hadiths in English for Kids with stories",
+  "Respectful children in Islam",
+  "Essential Dua's for kids",
+];
+
+function FreeTrail() {
+  const [selectedOption, setSelectedOption] = useState('Male');
+  const [input1, setInput1] = useState('');
+  const [phone, setPhone] = useState('');
+  const [input3, setInput3] = useState('');
+  const [input5, setInput5] = useState('');
+  const [input4, setInput4] = useState('');
+  const [course, setCourse] = useState(''); // New state for course
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  // Animation setup
+  const controls = useAnimation();
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.2 });
+
+  if (inView) {
+    controls.start('visible');
+  }
+
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: 'easeOut' },
+    },
+  };
+
+  const handleImageClick = () => setShowDropdown(prev => !prev);
+  const handleOptionClick = option => {
+    setInput4(option);
+    setShowDropdown(false);
+  };
+
+  const handleEnrollNowClick = () => {
+    // Define the email template parameters
+    const templateParams = {
+      to_name: 'Admin',
+      from_name: input1,
+      user_email: input3,
+      user_mobile: phone,
+      user_message: input4,
+      selected_course: course, // Added course to email params
+      name: input1,
+      mobile: phone,
+      email: input3,
+      message: input4,
+      course: course, // Added course to email params
+    };
+
+    // Send the email
+    emailjs
+      .send(
+        'service_a684mqv',
+        'template_x3m5vdh',
+        templateParams,
+        'R7RzaQFicwRxMNsAH'
+      )
+      .then(
+        result => {
+          console.log('Email sent successfully:', result.text);
+          toast.success('Email sent successfully!');
+        },
+        error => {
+          console.error('Error sending email:', error);
+          toast.error('Failed to send the email, please try again.');
+        }
+      );
+  };
+
+  return (
+    <motion.section
+      className='bg-[#1C8E5A] rounded-3xl p-4 mt-10'
+      ref={ref}
+      variants={sectionVariants}
+      initial='hidden'
+      animate={controls}
+    >
+      <div className='grid grid-cols-1 md:grid-cols-12 gap-4 bg-[#1C8E5A] overflow-hidden'>
+        <div className='col-span-12 md:col-span-5 flex justify-center items-center'>
+          <motion.img
+            src='/Frame 1261153739.png'
+            alt='Trial Image'
+            className='w-1/2'
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          />
+        </div>
+
+        <div className='col-span-12 md:col-span-7 flex flex-col gap-4 justify-center text-white'>
+          <motion.h1
+            className='text-[#FFD050] font-semibold text-2xl md:text-3xl lg:text-4xl mb-2 md:mb-4 text-center'
+            variants={sectionVariants}
+          >
+            Book 3 Days Free Trial
+          </motion.h1>
+
+          <motion.div
+            className='flex items-center gap-4 justify-center'
+            variants={sectionVariants}
+          >
+            <label
+              className={`flex items-center gap-2 ${selectedOption === 'Male' ? 'text-[#FFD050]' : 'text-[#9F9F9F]'
+                }`}
+            >
+              <input
+                type='radio'
+                value='Male'
+                checked={selectedOption === 'Male'}
+                onChange={() => setSelectedOption('Male')}
+                className={`form-radio cursor-pointer w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 focus:ring-0 ${selectedOption === 'Male'
+                  ? 'border-[#FFD050]'
+                  : 'border-transparent'
+                  } accent-[#FFD050]`}
+              />
+              <span>Male</span>
+            </label>
+            <label
+              className={`flex items-center gap-2 ${selectedOption === 'Female'
+                ? 'text-[#FFD050]'
+                : 'text-[#9F9F9F]'
+                }`}
+            >
+              <input
+                type='radio'
+                value='Female'
+                checked={selectedOption === 'Female'}
+                onChange={() => setSelectedOption('Female')}
+                className={`form-radio cursor-pointer w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 focus:ring-0 ${selectedOption === 'Female'
+                  ? 'border-[#FFD050]'
+                  : 'border-transparent'
+                  } accent-[#FFD050]`}
+              />
+              <span>Female</span>
+            </label>
+          </motion.div>
+
+          <motion.div
+            className='flex flex-col gap-y-4 mt-4'
+            variants={sectionVariants}
+          >
+            <div className='flex flex-col md:flex-row gap-4 relative'>
+              <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl relative'>
+                <img src='/solar_user-linear.png' alt='' />
+                <hr className='h-7 border-[#9F9F9F] border mx-2' />
+                <input
+                  type='text'
+                  value={input1}
+                  onChange={e => setInput1(e.target.value)}
+                  placeholder='Name'
+                  className='p-1 rounded-3xl text-black w-full outline-transparent'
+                />
+              </div>
+
+              <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl relative'>
+                <PhoneInput
+                  country={'gb'}
+                  value={phone}
+                  onChange={phone => setPhone(phone)}
+                  inputClass='text-black rounded-full w-full border-0 outline-none border-transparent'
+                  buttonClass='rounded-full'
+                  inputStyle={{
+                    color: 'black',
+                    backgroundColor: 'white',
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className='flex flex-col md:flex-row gap-4'>
+              <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
+                <img src='Frame 33.svg' alt='' />
+                <hr className='h-7 border-[#9F9F9F] border mx-2' />
+                <input
+                  type='text'
+                  value={input3}
+                  onChange={e => setInput3(e.target.value)}
+                  placeholder='Email'
+                  className='p-1 rounded-3xl text-black w-full outline-transparent'
+                />
+              </div>
+
+              <div className='flex items-center bg-white p-1 ps-3 w-full md:w-1/2 rounded-3xl'>
+                <LockIcon className='text-gray-400' />
+                <hr className='h-7 border-[#9F9F9F] border mx-2' />
+                <input
+                  type='password'
+                  value={input5}
+                  onChange={e => setInput5(e.target.value)}
+                  placeholder='Password'
+                  className='p-1 rounded-3xl text-black w-full outline-transparent'
+                />
+              </div>
+            </div>
+
+            {/* Added Course Dropdown Row */}
+            <div className='flex items-center bg-white p-1 ps-3 rounded-3xl'>
+              <BookOpen className='text-gray-400 w-5 h-5' />
+              <hr className='h-7 border-[#9F9F9F] border mx-2' />
+              <select
+                value={course}
+                onChange={e => setCourse(e.target.value)}
+                className='p-[6px] rounded-3xl text-black w-full outline-transparent bg-white cursor-pointer appearance-none'
+              >
+                <option value="" disabled>Select Course</option>
+                {COURSES.map((item, idx) => (
+                  <option key={idx} value={item}>{item}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className='flex items-center bg-white p-1 ps-3 rounded-3xl relative'>
+              <input
+                type='text'
+                value={input4}
+                onChange={e => setInput4(e.target.value)}
+                placeholder='Message'
+                className='p-[6px] ps-1 rounded-3xl text-black w-full outline-transparent'
+              />
+            </div>
+
+            <div className='flex justify-center mt-2'>
+              <button
+                onClick={handleEnrollNowClick}
+                className='bg-[#FFD050] text-nowrap w-full rounded-full px-6 py-2 transition duration-300 ease-in-out hover:bg-[#FFC048] focus:outline-none focus:ring-2 focus:ring-[#FFD050] focus:ring-opacity-50 font-bold'
+              >
+                Start 3 Days Free Trial
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
+export default FreeTrail;
+
+--- END OF FILE: src\Pages\AboutUs\FreeTrail.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Pages\AboutUs\index.jsx ---
+
+import React from 'react';
+import About from './About';
+import Footer from '../../Components/Footer';
+
+const index = () => {
+  return(
+  
+  <>
+      <About />
+      <Footer/>
+    </>
+  )
+};
+export default index;
+
+
+--- END OF FILE: src\Pages\AboutUs\index.jsx ---
+
+================================================================================
+
+        └── ContactUs/
+                ├── ConatctSection.jsx
+                ├── ContactUs.jsx
+                ├── Contactdetail.jsx
+
+--- START OF FILE: src\Pages\ContactUs\ConatctSection.jsx ---
+
+import React from 'react'
+
+function ContactSection() {
+  return (
+    <>
+      <section className="relative bg-gray-100">
+        <div className="">
+          <div className="relative">
+            <img
+              src="/Frame 1261153746.png"
+              alt=""
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        </div>
+        <h1 className="absolute inset-0 flex items-center justify-center font-semibold text-3xl sm:text-4xl md:text-5xl xl:text-7xl text-[#1A1A1A] z-10">
+          Contact US
+        </h1>
+      </section>
+    </>
+  );
+}
+
+export default ContactSection;
+
+--- END OF FILE: src\Pages\ContactUs\ConatctSection.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Pages\ContactUs\ContactUs.jsx ---
+
+import React from 'react'
+import ContactSection from './ConatctSection';
+import FreeTrail from '../AboutUs/FreeTrail';
+import Footer from '../../Components/Footer';
+import Contactdetail from './Contactdetail';
+
+function ContactUs() {
+  return (
+    <>
+      <ContactSection />
+      <Contactdetail/>
+      <div className="px-4 md:px-10">
+        <FreeTrail />
+      </div>
+      <Footer />
+    </>
+  );
+}
+
+export default ContactUs
+
+--- END OF FILE: src\Pages\ContactUs\ContactUs.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Pages\ContactUs\Contactdetail.jsx ---
+
+import React, { useState } from "react";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import emailjs from "emailjs-com";
+import { toast } from 'sonner';
+
+function ContactDetail() {
+  const [input1, setInput1] = useState("");
+  const [input2, setInput2] = useState("");
+  const [input3, setInput3] = useState("");
+  const [message, setMessage] = useState("");
+
+  const contactInfo = [
+    {
+      title: "Our Address",
+      description: "H no R-107 Gulistan e Malir, Shah Faisal, Karachi, Pakistan",
+      iconSrc: "/Frame 141.svg",
+      iconAlt: "Address Icon",
+    },
+    {
+      title: "Phone Number",
+      description: "+92 3132661982",
+      iconSrc: "/Frame 143.svg",
+      iconAlt: "Phone Icon",
+    },
+    {
+      title: "Email Address",
+      description: "theislamicglobalinstitute456@gmail.com",
+      iconSrc: "/Frame 142.svg",
+      iconAlt: "Email Icon",
+    },
+    {
+      title: "Working Hours",
+      description: "Our customer representative team is available 24/7.",
+      iconSrc: "/Frame 144.svg",
+      iconAlt: "Clock Icon",
+    },
+  ];
+
+  const handleEnrollNowClick = (e) => {
+    e.preventDefault(); // Prevent form submission
+
+    // Define the email template parameters
+    const templateParams = {
+      to_name: "Admin",
+      from_name: input1,
+      user_email: input3,
+      user_mobile: input2,
+      user_message: message, // Changed to use `message`
+    };
+
+    // Send the email
+    emailjs
+      .send(
+        "service_a684mqv",
+        "template_x3m5vdh",
+        templateParams,
+        "R7RzaQFicwRxMNsAH" // Replace with your Email.js user ID
+      )
+      .then(
+        (result) => {
+          console.log("Email sent successfully:", result.text);
+          toast.success("Email sent successfully!");
+        },
+        (error) => {
+          console.error("Error sending email:", error);
+          toast.error("Failed to send the email, please try again.");
+        }
+      );
+  };
+
+  return (
+    <section className="p-4 sm:p-6 md:p-8 lg:px-10 xl:px-12 2xl:px-16">
+      <form onSubmit={handleEnrollNowClick}>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-10 lg:gap-16 mt-6">
+          {/* Contact Info Section */}
+          <div className="col-span-12 md:col-span-6 bg-white rounded-lg p-4 sm:p-6 lg:p-8 space-y-4 md:space-y-6">
+            {contactInfo.map((item, index) => (
+              <div key={index}>
+                <div className="flex gap-4 items-start">
+                  <div className="p-2 rounded-full flex-shrink-0 h-12 w-12 sm:h-14 sm:w-14 flex items-center justify-center">
+                    <img
+                      src={item.iconSrc}
+                      alt={item.iconAlt}
+                      className="h-8 w-8 sm:h-10 sm:w-10"
+                    />
+                  </div>
+                  <div>
+                    <h1 className="text-base sm:text-lg font-semibold text-gray-800">
+                      {item.title}
+                    </h1>
+                    <p className="text-sm sm:text-base text-gray-600">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+                {index < contactInfo.length - 1 && (
+                  <hr className="border-gray-300 mt-3 md:mt-5" />
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Contact Form Section */}
+          <div className="col-span-12 md:col-span-6 mt-4 md:mt-0 rounded-lg shadow-lg p-4 sm:p-6 lg:p-8">
+            <div className="flex flex-col w-full gap-y-4 sm:gap-y-6">
+              {/* Name Input */}
+              <div className="flex items-center bg-white p-2 sm:p-3 w-full rounded-full shadow-md hover:shadow-lg transition-shadow duration-300">
+                <img src="/solar_user-linear.png" alt="User Icon" />
+                <hr className="h-7 border-[#9F9F9F] border mx-2" />
+                <input
+                  type="text"
+                  value={input1}
+                  onChange={(e) => setInput1(e.target.value)}
+                  placeholder="Name"
+                  className="p-1 sm:p-2 rounded-full text-gray-700 w-full outline-none"
+                  required
+                />
+              </div>
+
+              {/* Phone Input */}
+              <div className="flex items-center bg-white p-2 sm:p-3 w-full rounded-full shadow-md hover:shadow-lg transition-shadow duration-300">
+                <PhoneInput
+                  country="gb"
+                  value={input2}
+                  onChange={(phone) => setInput2(phone)}
+                  inputClass="text-gray-700 rounded-full w-full outline-none border-none"
+                  buttonClass="rounded-full"
+                  required
+                />
+              </div>
+
+              {/* Email Input */}
+              <div className="flex items-center bg-white p-2 sm:p-3 w-full rounded-full shadow-md hover:shadow-lg transition-shadow duration-300">
+                <img src="/Frame 33.svg" alt="Email Icon" />
+                <hr className="h-7 border-[#9F9F9F] border mx-2" />
+                <input
+                  type="email"
+                  value={input3}
+                  onChange={(e) => setInput3(e.target.value)}
+                  placeholder="Email"
+                  className="p-1 sm:p-2 rounded-full text-gray-700 w-full outline-none"
+                  required
+                />
+              </div>
+
+              {/* Message Textarea */}
+              <div className="relative mb-3 rounded-2xl pt-3 px-2 shadow-md hover:shadow-lg transition-shadow duration-300">
+                <textarea
+                  className="peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none"
+                  rows="4"
+                  placeholder="Your message"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  required
+                ></textarea>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-center items-center mt-8 md:mt-10">
+              <button
+                type="submit" // Ensure it triggers form submission
+                className="bg-[#FFD050] font-semibold py-2 px-4 rounded-full hover:bg-yellow-400 w-3/4"
+              >
+                Enroll Now
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </section>
+  );
+}
+
+export default ContactDetail;
+
+
+--- END OF FILE: src\Pages\ContactUs\Contactdetail.jsx ---
+
+================================================================================
+
+        └── Courses/
+                ├── Card.jsx
+                ├── Courses.jsx
+                ├── index.jsx
+
+--- START OF FILE: src\Pages\Courses\Card.jsx ---
+
+import React from "react";
+
+const Card = ({
+  title,
+  description,
+  icon,
+  isActive,
+  buttonText,
+  onClick, // Accept the onClick function as a prop
+}) => {
+  return (
+    <>
+      <div className="relative flex flex-col justify-between h-full sm:px-5 px-5">
+        {/* Icon Section */}
+        <div className="flex items-center justify-center translate-y-12 z-20 relative">
+          <img src={icon} alt={`${title} Icon`} className="w-100 h-100" />
+        </div>
+
+        {/* Card Content */}
+        <div className="bg-white shadow-lg rounded-[30px_30px_0px_0px] p-5 flex-grow">
+          <div className="flex justify-end items-start w-full">
+            <img src="/Card-right.png" alt="" />
+          </div>
+          <div className="mt-2 text-center">
+            <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
+            <p className="text-gray-600 mt-2 text-start">{description}</p>
+          </div>
+        </div>
+
+        {/* Button Section with Green Hover */}
+        <div
+          className={`transition-transform transform hover:bg-[#1C8E5A] cursor-pointer p-2 z-10 ${
+            isActive ? "bg-[#1C8E5A]" : "bg-[#E1E1E1]"
+          }`}
+          onClick={onClick} // Trigger modal toggle on click
+        >
+          <button className="px-4 py-2 text-white rounded-full flex items-center justify-center cursor-default">
+            {buttonText}
+            <span className="ml-2">&gt;&gt;</span>
+          </button>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Card;
+
+
+--- END OF FILE: src\Pages\Courses\Card.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Pages\Courses\Courses.jsx ---
+
+import React, { useState } from "react";
+import Card from "./Card"; // Import the Card component
+import Modal from "../../Components/Modal"; // Import the Modal component
+
+const Courses = () => {
+  // Set the first card as active by default (index 0)
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Handle card click to set active card and open modal
+  const handleCardClick = (index) => {
+    setActiveCardIndex(index);
+    setIsModalOpen(true);
+  };
+
+  const courses = [
+    {
+      title: "Qaida with Tajweed",
+      description:
+        "This course is a great starting point for children learning the Quran. By the end, students will recognize and pronounce Arabic letters, grasp basic rules, and connect letters accurately, building a strong foundation for reading with correct pronunciation.",
+      buttonText: "Enroll Now",
+      icon: "/card-logo-Quran.svg",
+    },
+    {
+      title: "Quran With Tajweed",
+      description:
+        "Learn to read the Quran online with personalized lessons, guided by experienced tutors. Our interactive platform helps you or your child build Quran reading skills with proper pronunciation and fluency from the comfort of home.",
+      buttonText: "Enroll Now",
+      icon: "/Frame 1261153732.svg",
+    },
+    {
+      title: "Quran Memorization (HIFZ) Online",
+      description:
+        "Explore Quran reading with Tafseer to deepen your understanding of the verses. Our online sessions provide clear explanations and insights, helping you connect with the teachings and wisdom of the Quran.",
+      buttonText: "Enroll Now",
+      icon: "/Frame 1261153733.svg",
+    },
+    {
+      title: "Quran English Translation",
+      description:
+        "Discover the essence of Islamic teachings through our online courses. We offer a comprehensive platform to explore fundamental principles, values, and practices of Islam, fostering a deeper connection to your faith.",
+      buttonText: "Enroll Now",
+      icon: "/Frame 1261153734.svg",
+    },
+    {
+      title: "Taleem ul Islam in English",
+      description:
+        "Learn to read the Quran online with personalized lessons, guided by experienced tutors. Our interactive platform helps you or your child build Quran reading skills with proper pronunciation and fluency from the comfort of home.",
+      buttonText: "Enroll Now",
+      icon: "/Frame 1261153735.svg",
+    },
+    {
+      title: "Quran Urdu Tafseer",
+      description:
+        "Master Quran reading with Tajweed through our online classes, designed to teach precise pronunciation and proper recitation techniques. Learn from expert tutors and enhance your understanding and fluency with ease from home.",
+      buttonText: "Enroll Now",
+      icon: "/Frame 1261153736.svg",
+    },
+    {
+      title: "Ghusl Wudhu Salah in English",
+      description:
+        "Master Quran reading with Tajweed through our online classes, designed to teach precise pronunciation and proper recitation techniques. Learn from expert tutors and enhance your understanding and fluency with ease from home.",
+      buttonText: "Enroll Now",
+      icon: "/Frame 1261153736.svg",
+    },
+    {
+      title: "40 Hadiths in English for Kids with stories",
+      description:
+        "Master Quran reading with Tajweed through our online classes, designed to teach precise pronunciation and proper recitation techniques. Learn from expert tutors and enhance your understanding and fluency with ease from home.",
+      buttonText: "Enroll Now",
+      icon: "/Frame 1261153736.svg",
+    },
+    {
+      title: "Respectful children in Islam",
+      description:
+        "Master Quran reading with Tajweed through our online classes, designed to teach precise pronunciation and proper recitation techniques. Learn from expert tutors and enhance your understanding and fluency with ease from home.",
+      buttonText: "Enroll Now",
+      icon: "/Frame 1261153736.svg",
+    },
+    {
+      title: "Essential Dua`s for kids",
+      description:
+        "Master Quran reading with Tajweed through our online classes, designed to teach precise pronunciation and proper recitation techniques. Learn from expert tutors and enhance your understanding and fluency with ease from home.",
+      buttonText: "Enroll Now",
+      icon: "/Frame 1261153736.svg",
+    },
+  ];
+
+  return (
+    <>
+      <section>
+        <div className="relative">
+          <img
+            src="/Group 12.png"
+            alt="About-Us"
+            className="max-w-full h-auto"
+          />
+          <div className="absolute inset-0 flex flex-col justify-center items-start text-start px-4 md:px-16 mb-6 md:mb-0">
+            <h1 className="font-semibold text-3xl sm:text-4xl md:text-5xl xl:text-7xl text-[#1A1A1A]">
+              Courses
+            </h1>
+            <p className="text-[#1A1A1A] text-2xl md:text-4xl font-medium mt-4">
+              What We Offer
+            </p>
+          </div>
+        </div>
+
+        <div className="px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 h-full">
+          {courses.map((course, index) => (
+            <Card
+              key={index}
+              title={course.title}
+              description={course.description}
+              icon={course.icon}
+              isActive={activeCardIndex === index} // Set active state based on the activeCardIndex
+              onClick={() => handleCardClick(index)} // Update active card and open modal on click
+              buttonText={course.buttonText}
+            />
+          ))}
+        </div>
+
+        {/* Modal */}
+        {isModalOpen && (
+          <Modal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
+        )}
+      </section>
+    </>
+  );
+};
+
+export default Courses;
+
+
+--- END OF FILE: src\Pages\Courses\Courses.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Pages\Courses\index.jsx ---
+
+import React from "react";
+import Courses from "./Courses";
+import FreeTrail from "../AboutUs/FreeTrail";
+import Footer from "../../Components/Footer";
+
+function index() {
+  return (
+    <>
+      <div>
+        <Courses />
+        <div className="px-4 md:px-10">
+          <FreeTrail />
+        </div>
+        <Footer />
+      </div>
+    </>
+  );
+}
+
+export default index;
+
+
+--- END OF FILE: src\Pages\Courses\index.jsx ---
+
+================================================================================
+
+        └── FAQs/
+                ├── FAQs.jsx
+                ├── FAQsSection.jsx
+                ├── FAQsdetail.jsx
+
+--- START OF FILE: src\Pages\FAQs\FAQs.jsx ---
+
+import React from 'react'
+import FAQsSection from './FAQsSection'
+import FreeTrail from '../AboutUs/FreeTrail';
+import Footer from '../../Components/Footer';
+import FAQsdetail from './FAQsdetail';
+
+function FAQs() {
+  return (
+    <>
+      <FAQsSection />
+      <FAQsdetail/>
+      <div className="px-4 md:px-10">
+        <FreeTrail/>
+      </div>
+      <Footer/>
+    </>
+  );
+}
+
+export default FAQs
+
+--- END OF FILE: src\Pages\FAQs\FAQs.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Pages\FAQs\FAQsSection.jsx ---
+
+import React from 'react'
+
+function FAQsSection() {
+  return (
+    <>
+      <section className="relative bg-gray-100">
+        <div className="">
+          <div className="relative">
+            <img
+              src="/Frame 1261153747.png"
+              alt=""
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        </div>
+        <h1 className="absolute inset-0 flex items-center justify-center font-semibold text-3xl sm:text-4xl md:text-5xl xl:text-7xl text-[#1A1A1A]">
+          FAQs
+        </h1>
+      </section>
+    </>
+  );
+}
+
+export default FAQsSection;
+
+--- END OF FILE: src\Pages\FAQs\FAQsSection.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Pages\FAQs\FAQsdetail.jsx ---
+
+import React, { useState } from "react";
+
+function FAQsdetail() {
+  const faqs = [
+    {
+      title: "How can I enroll?",
+      content:
+        "To get started, simply click the “Enroll Now” button to fill out the online registration form. Provide your basic details, including your name, email address, and phone number, then select the course you wish to enroll now. Once you submit this information, your registration will be processed. After receiving your request, we will reach out to arrange a time for your free trial class. Additionally, we’ll guide you through our Quran teaching methods and share more about our organization.",
+    },
+    {
+      title: "Do you offer a free trial?",
+      content:
+        "Yes, Learning Quran Institute offers a complimentary trial period. After enrollment, new students can experience our online teaching methods and services firsthand through our free trial classes. This trial is entirely free of charge.",
+    },
+    {
+      title: "How can I learn Quran at home?",
+      content:
+        "Our business model revolves around online education. All you need is a stable internet connection and a compatible device such as an Android or iPhone, tablet, laptop, or computer (Windows or Mac). Learning online is simple and convenient via platforms like Skype, Google Meet, or Zoom. Once you or your child is registered and selects a specific class time, you just need to be online at that scheduled time to connect with our instructor. It’s a straightforward and accessible way to learn.",
+    },
+    {
+      title:
+        "How long will it take to learn to memorize Quran, read Quran, and Tajweed Quran?",
+      content:
+        "To excel in Quran reading and recitation, enroll in our Tajweed course, which spans 60 days. This course covers essential grammatical rules for pronouncing both heavy and light letters, as well as the correct sounds, articulation, and characteristics necessary for Quran reading. You will learn about Noon Saakin, Tanween, Meem Saakin, Qalqala, Laam, Raa, Madd, and how to properly stop at the end of words. The main objective of the Tajweed course is to deepen your understanding of the Quran, enabling you to grasp the teachings and meanings of the verses. Additionally, Tajweed clarifies Quranic rules and provides the foundational knowledge needed for accurate recitation. Your memorization speed will guide you in continuing with Hifz, which may take two years or more to achieve mastery.",
+    },
+    {
+      title: "What happens if I couldn’t attend a lesson?",
+      content:
+        "If you are unable to attend a class due to unforeseen circumstances, please inform us at least 30 minutes before the class starts. Once regular classes conclude, our instructors will offer makeup sessions. Depending on availability, a different instructor may conduct your makeup class.",
+    },
+    {
+      title: "Does “Learning Quran Institute” offer any discount?",
+      content:
+        "Yes, we offer a family discount if two or more members from the same household register with LQI. Additionally, special packages are available for new members to enhance their learning experience.",
+    },
+    {
+      title: "At what age we can start?",
+      content:
+        "There is no specific age requirement for children to start learning the Holy Quran or enrolling in online Quran classes. Each child's cognitive development and the teaching methods employed can vary, allowing for flexibility in when they begin their Quranic education.",
+    },
+    {
+      title: "How much will it cost to join Learning Quran Institute?",
+      content:
+        "Learning Quran Institute offers a more affordable alternative to traditional online education. Our Quran classes require payment only for the sessions you enroll in. The course fees cover all necessary materials and customer support, ensuring there are no hidden costs.",
+    },
+    // Add other FAQ items here
+  ];
+
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const toggleContent = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
+  return (
+    <section className="px-4 md:px-20  md:mt-16 mt-6">
+      {faqs.map((faq, index) => (
+        <div key={index} className="mb-4">
+          <div className="px-4 gap-4 md:px-10 bg-[#F6F6F6] rounded-md flex justify-between items-center">
+            <div className="flex p-4 justify-between items-center w-full">
+              <h1
+                className={`font-normal text-base md:text-lg ${
+                  openIndex === index ? "text-green-600" : "text-[#252525]"
+                }`}
+              >
+                {faq.title}
+              </h1>
+
+              <img
+                src="/icon-park-outline_down.svg"
+                alt="icon-down"
+                className="cursor-pointer transition-transform duration-300"
+                onClick={() => toggleContent(index)}
+                style={{
+                  transform:
+                    openIndex === index ? "rotate(180deg)" : "rotate(0deg)",
+                }}
+              />
+            </div>
+          </div>
+          <hr className=" border border-[#000000] mt-4" />
+
+          {openIndex === index && (
+            <div className="px-12 py-4 mt-2 bg-gray-100 rounded-md">
+              <p className="text-base md:text-lg text-[#333333]">
+                {faq.content}
+              </p>
+            </div>
+          )}
+        </div>
+      ))}
+    </section>
+  );
+}
+
+export default FAQsdetail;
+
+
+--- END OF FILE: src\Pages\FAQs\FAQsdetail.jsx ---
+
+================================================================================
+
+        └── Home/
+                ├── Crousel.jsx
+                ├── WhatweOffer.jsx
+                ├── WhyChoseMe.jsx
+                ├── index.jsx
+
+--- START OF FILE: src\Pages\Home\Crousel.jsx ---
+
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import Modal from '../../Components/Modal';
+
+const Carousel = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  const slides = [
+    {
+      title: 'Learn Quran for kids',
+      description:
+        'Interactive Quran lessons for kids online, taught by experienced teachers for a strong foundation in faith.',
+      bgImageDesktop: "bg-[url('/Group-12.png')]",
+      bgImageMobile: "bg-[url('/Group-12.png')]",
+    },
+    {
+      title: 'Learn Quran Online anytime anywhere',
+      description:
+        'Learn the Quran at your own pace, with online classes available anytime and from any location.',
+      bgImageDesktop: "bg-[url('/Frame-417.png')]",
+      bgImageMobile: "bg-[url('/Frame-417.png')]",
+    },
+    {
+      title: 'Quran Online Classes',
+      description:
+        'Experience engaging Quran classes online , tailored for your convenience and spiritual growth!',
+      bgImageDesktop: "bg-[url('/Group-12.png')]",
+      bgImageMobile: "bg-[url('/Group-12.png')]",
+    },
+  ];
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      goToNextSlide();
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [currentIndex]);
+
+  const goToNextSlide = () => {
+    setCurrentIndex(prevIndex =>
+      prevIndex === slides.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const goToPreviousSlide = () => {
+    setCurrentIndex(prevIndex =>
+      prevIndex === 0 ? slides.length - 1 : prevIndex - 1
+    );
+  };
+
+  const textVariants = {
+    hidden: { opacity: 0, x: -50 },
+    visible: { opacity: 1, x: 0 },
+  };
+
+  const buttonVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  const bgVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+  };
+
+  const iconVariants = {
+    hidden: { opacity: 0, x: 50 },
+    visible: { opacity: 1, x: 0 },
+  };
+
+  return (
+    <div className='relative h-[75vh] w-full md:h-[80vh] overflow-hidden'>
+      {slides.map((slide, index) => (
+        <motion.div
+          key={index}
+          className={`absolute w-50 md:w-full md:h-full ${
+            isMobile ? 'bg-contain bg-no-repeat' : 'bg-cover'
+          } flex items-center justify-between ${
+            currentIndex === index ? 'block' : 'hidden'
+          } ${isMobile ? slide.bgImageMobile : slide.bgImageDesktop}`}
+          initial='hidden'
+          animate='visible'
+          exit='hidden'
+          transition={{ duration: 1 }}
+          variants={bgVariants}
+        >
+          <div className='text-left text-white px-12 pt-60 md:pt-0 w-full md:w-[40%]'>
+            <motion.h2
+              key={`title-${currentIndex}`}
+              className='text-2xl md:text-4xl font-bold text-[#1A1A1A]'
+              variants={textVariants}
+              initial='hidden'
+              animate='visible'
+              transition={{ duration: 1 }}
+            >
+              {slide.title}
+            </motion.h2>
+            <motion.p
+              key={`desc-${currentIndex}`}
+              className='mt-4 text-[#4F4F4F]'
+              variants={textVariants}
+              initial='hidden'
+              animate='visible'
+              transition={{ delay: 0.5, duration: 1 }}
+            >
+              {slide.description}
+            </motion.p>
+            <motion.button
+              key={`button-${currentIndex}`}
+              className='mt-10 md:mt-4 px-4 py-2 bg-yellow-500 text-white rounded'
+              onClick={() => setIsModalOpen(true)}
+              variants={buttonVariants}
+              initial='hidden'
+              animate='visible'
+              transition={{ delay: 1, duration: 1 }}
+            >
+              Start 3 Days Free Trial
+            </motion.button>
+          </div>
+
+          {/* Social Media Icons */}
+          <motion.div
+            className={`absolute right-13 md:right-0  top-[45%] md:top-[30%] transform -translate-y-1/2 ${
+              isMobile ? 'flex-row space-x-6' : 'flex-col space-y-4'
+            } flex mr-4`}
+            variants={iconVariants}
+            initial='hidden'
+            animate='visible'
+            transition={{ delay: 1.5, duration: 1 }}
+          >
+            <a
+              href='https://www.youtube.com/@Szoya-m9q'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <img src='/Youtube.svg' className='w-6 md:w-10' alt='YouTube' />
+            </a>
+            <a
+              href='https://join.skype.com/invite/BOf0VvMKyAVe'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <img src='/skype.svg' className='w-6 md:w-10' alt='Skype' />
+            </a>
+            <a
+              href='https://wa.me/923132661982?text='
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <img
+                src='/whtsapp-crousel.svg'
+                className='w-6 md:w-10'
+                alt='whtsapp'
+              />
+            </a>{' '}
+            <a
+              href='https://www.instagram.com/alquran.digital.institute'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <img
+                src='/instagram.svg'
+                className='w-6 md:w-10'
+                alt='Instagram'
+              />
+            </a>
+            <a
+              href='https://www.facebook.com/profile.php?id=61585265797269'
+              target='_blank'
+              rel='noopener noreferrer'
+            >
+              <img
+                src='/facebook-logo.svg'
+                className='w-6 md:w-10'
+                alt='Facebook'
+              />
+            </a>
+          </motion.div>
+        </motion.div>
+      ))}
+
+      <div className='absolute bottom-4 left-0 right-0 flex justify-center space-x-2'>
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            className={`w-3 h-3 rounded-full ${
+              currentIndex === index ? 'bg-yellow-500' : 'bg-gray-300'
+            }`}
+            onClick={() => setCurrentIndex(index)}
+          />
+        ))}
+      </div>
+
+      <Modal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
+    </div>
+  );
+};
+
+export default Carousel;
+
+
+--- END OF FILE: src\Pages\Home\Crousel.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Pages\Home\WhatweOffer.jsx ---
+
+import { motion, useAnimation } from 'framer-motion';
+import React, { useState } from 'react';
+import { useInView } from 'react-intersection-observer';
+import Modal from "../../Components/Modal"; // Adjust path as needed
+
+const WhatweOffer = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const courses = [
+    {
+      title: 'Qaida with Tajweed.',
+      description:
+        'This course is a great starting point for children learning the Quran. By the end, students will recognize and pronounce Arabic letters, grasp basic rules, and connect letters accurately.',
+      buttonText: 'Start 3 Days Free Trial',
+      icon: '/card-logo-Quran.svg',
+    },
+    {
+      title: 'Quran With Tajweed',
+      description:
+        'This course is a great starting point for children learning the Quran. By the end, students will recognize and pronounce Arabic letters, grasp basic rules, and connect letters accurately.',
+      buttonText: 'Start 3 Days Free Trial',
+      icon: '/card-logo-Quran.svg',
+    },
+    {
+      title: 'Quran Memorization (HIFZ)',
+      description:
+        'Learn Arabic online with personalized lessons guided by experienced tutors for proper pronunciation and fluency.',
+      buttonText: 'Start 3 Days Free Trial',
+      icon: '/Frame 1261153731 (2).svg',
+    },
+    {
+      title: 'Quran English Translation',
+      description:
+        'Master Quran reading with Tajweed and deep understanding through Tafseer with expert tutors.',
+      buttonText: 'Start 3 Days Free Trial',
+      icon: '/Frame 1261153737.svg',
+    },
+    {
+      title: 'Taleem ul Islam in English',
+      description:
+        'Learn essential Islamic practices with step-by-step guidance in an easy and understandable way.',
+      buttonText: 'Start 3 Days Free Trial',
+      icon: '/Frame 1261153731 (1).svg',
+    },
+    {
+      title: 'Quran Urdu Tafseer',
+      description:
+        'Interactive hadith learning for kids with engaging stories to build strong Islamic values.',
+      buttonText: 'Start 3 Days Free Trial',
+      icon: '/Frame 1261153737.svg',
+    },
+    {
+      title: 'Ghusl Wudhu Salah in English',
+      description:
+        'Comprehensive Islamic education for children covering beliefs, manners, and daily practices.',
+      buttonText: 'Start 3 Days Free Trial',
+      icon: '/Frame 1261153738.svg',
+    },
+    {
+      title: '40 Hadiths in English for Kids with stories',
+      description:
+        'Comprehensive Islamic education for children covering beliefs, manners, and daily practices.',
+      buttonText: 'Start 3 Days Free Trial',
+      icon: '/Frame 1261153738.svg',
+    },
+    {
+      title: 'Respectful children in Islam',
+      description:
+        'Comprehensive Islamic education for children covering beliefs, manners, and daily practices.',
+      buttonText: 'Start 3 Days Free Trial',
+      icon: '/Frame 1261153738.svg',
+    },
+    {
+      title: ' Essential Dua`s for kids',
+      description:
+        'Comprehensive Islamic education for children covering beliefs, manners, and daily practices.',
+      buttonText: 'Start 3 Days Free Trial',
+      icon: '/Frame 1261153738.svg',
+    },
+  ];
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+  };
+
+  return (
+    <div className="relative bg-[#3F3322] px-0 md:px-10">
+      <div className="absolute inset-0 bg-[url('/what-we-offer.png')] bg-cover bg-center opacity-40 hidden md:block"></div>
+
+      <div className="relative z-10 text-center pt-6 pb-4 -mt-6">
+        <p className="text-yellow-400 font-bold text-3xl sm:text-4xl md:text-5xl">WHAT WE OFFER</p>
+        <p className="text-white text-2xl font-bold mt-1">
+          We Deliver Top-Quality Arabic & Quran Instruction
+        </p>
+      </div>
+
+      <div className="relative z-10 px-5 md:px-8 -mt-4 pb-6 mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        {courses.map((course, index) => {
+          const controls = useAnimation();
+          const { ref, inView } = useInView({ threshold: 0.2, triggerOnce: true });
+          if (inView) controls.start('visible');
+
+          return (
+            <motion.div
+              key={index}
+              ref={ref}
+              variants={cardVariants}
+              initial="hidden"
+              animate={controls}
+              className="relative"
+            >
+              <div className="flex justify-center translate-y-8 relative z-20">
+                <img src={course.icon} alt={course.title} />
+              </div>
+
+              <div className="bg-white h-[260px] shadow-lg rounded-[30px_30px_0px_0px] p-5">
+                <div className="flex justify-end">
+                  <img src="/Card-right.png" alt="" />
+                </div>
+                <div className="mt-1 text-center">
+                  <h3 className="text-lg font-semibold text-gray-800">{course.title}</h3>
+                  <p className="text-gray-600 mt-1 text-start text-sm">{course.description}</p>
+                </div>
+              </div>
+
+              <motion.div
+                className="p-1 bg-[#1C8E5A]"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  setSelectedCourse(course); // Set the course here
+                  setIsModalOpen(true);
+                  setActiveIndex(index);
+                }}
+              >
+                <button className="px-4 py-2 font-semibold rounded-full flex items-center justify-center text-white w-full">
+                  {course.buttonText}
+                  <img
+                    src={activeIndex === index ? '/active-arrows.svg' : '/arrows.svg'}
+                    className="ms-3"
+                    alt=""
+                  />
+                </button>
+              </motion.div>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Pass the course object to the modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        course={selectedCourse}
+      />
+    </div>
+  );
+};
+
+export default WhatweOffer;
+
+--- END OF FILE: src\Pages\Home\WhatweOffer.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Pages\Home\WhyChoseMe.jsx ---
+
+import React from 'react';
+
+const WhyChoseMe = () => {
+  return (
+    <div className='bg-gray-50'>
+      <div className='flex justify-center items-center min-h-[80vh] py-12 md:py-16'>
+        <div className='max-w-6xl mx-auto flex flex-col md:flex-row items-center  md:items-start px-4 sm:px-8 md:px-4 lg:px-0 space-y-10 md:space-y-0'>
+          {/* Left: Images Section */}
+          <div className='flex flex-col space-y-4 justify-center items-center w-full md:w-1/2 lg:w-1/3'>
+            <div className='w-full  flex justify-center items-center'>
+              <img
+                src='/why-chose-side-image.svg'
+                className='w-full h-auto'
+                alt='Large Image'
+              />
+            </div>
+          </div>
+
+          {/* Right: Text Section */}
+          <div className='w-full md:w-1/2 lg:w-2/3 mt-8 md:mt-0 md:ml-8 space-y-4'>
+            <h3 className='text-green-500 font-semibold text-lg text-center md:text-left'>
+              Why Choose
+            </h3>
+            <h1 className='text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 text-center md:text-left'>
+              Islamic Global Institute 
+            </h1>
+            <p className='text-gray-600 text-start md:text-left mt-4 text-sm sm:text-base '>
+              Our innovative online teaching approach makes learning through the
+              internet simpler and more effective than ever. We’ve thoughtfully
+              crafted courses tailored both for beginners and those seeking to
+              reinforce their knowledge with accurate pronunciation.
+              Additionally, we offer specialized courses for those who wish to
+              study the Quran online, with a focus on tajweed and tafseer,
+              ensuring a comprehensive and accessible learning experience for
+              all.
+            </p>
+
+            {/* Flexbox for paragraphs with proper spacing */}
+            <div className='mt-6 grid grid-cols-1 gap-6 md:grid-cols-2'>
+              <div className='flex flex-col items-center md:items-start'>
+                <img
+                  src='/parar-upper-line.svg'
+                  className='w-[60%] md:w-[50%] lg:w-[40%]'
+                  alt='Upper line'
+                />
+                <h4 className='text-lg md:text-xl font-semibold text-gray-800 mt-2'>
+                  Free Trial Classes for All
+                </h4>
+                <p className='text-gray-600 text-start md:text-left mt-2 text-sm '>
+                  We offer years of expertise in teaching the Quran online for
+                  the sake of Allah. Try a free class anytime—register for Skype
+                  lessons or contact us for a consultation!
+                </p>
+              </div>
+              <div className='flex flex-col items-center md:items-start'>
+                <img
+                  src='/parar-upper-line.svg'
+                  className='w-[60%] md:w-[50%] lg:w-[40%]'
+                  alt='Upper line'
+                />
+                <h4 className='text-lg md:text-xl font-semibold text-gray-800 mt-2'>
+                  Flexible Schedule
+                </h4>
+                <p className='text-gray-600 text-start md:text-left mt-2 text-sm '>
+                  Our Institute offers high-quality Quran classes in an engaging
+                  digital setting, allowing you and your family to learn from
+                  home. Our tutors are available 24/7 to support your journey.
+                </p>
+              </div>
+              <div className='flex flex-col items-center md:items-start'>
+                <img
+                  src='/parar-upper-line.svg'
+                  className='w-[60%] md:w-[50%] lg:w-[40%]'
+                  alt='Upper line'
+                />
+                <h4 className='text-lg md:text-xl font-semibold text-gray-800 mt-2'>
+                  One-to-One Classes
+                </h4>
+                <p className='text-gray-600 text-start md:text-left mt-2 text-sm '>
+                  We provides one-on-one Quran classes with a dedicated teacher,
+                  offering personalized instruction in Quran reading,
+                  memorization, and tafseer. Each student receives focused,
+                  individualized learning for an effective Quran study
+                  experience.
+                </p>
+              </div>
+              <div className='flex flex-col items-center md:items-start'>
+                <img
+                  src='/parar-upper-line.svg'
+                  className='w-[60%] md:w-[50%] lg:w-[40%]'
+                  alt='Upper line'
+                />
+                <h4 className='text-lg md:text-xl font-semibold text-gray-800 mt-2'>
+                  Multilingual Teachers
+                </h4>
+                <p className='text-gray-600 text-start md:text-left mt-2 text-sm '>
+                  Our Institute features skilled teachers fluent in Arabic,
+                  English, and Urdu, ensuring clear and effective communication
+                  for a smooth learning experience in Quran classes.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default WhyChoseMe;
+
+
+--- END OF FILE: src\Pages\Home\WhyChoseMe.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Pages\Home\index.jsx ---
+
+import React from 'react';
+import Crousel from '/src/Pages/Home/Crousel.jsx';
+import WhatweOffer from './WhatweOffer';
+import WhyChoseME from './WhyChoseMe';
+import FreeTrail from "../../Pages/AboutUs/FreeTrail";
+import Footer from "../../Components/Footer";
+import FeesPlans from '../../Pages/Pricing/FeesPlans';
+const index = () => {
+  return (
+    <div>
+      <Crousel />
+      <div className="px-4 md:px-10">
+        <FreeTrail />
+      </div>
+      <WhyChoseME />
+      <WhatweOffer />
+      <FeesPlans />
+
+      <Footer />
+    </div>
+  );
+};
+export default index;
+
+
+--- END OF FILE: src\Pages\Home\index.jsx ---
+
+================================================================================
+
+        └── Pricing/
+                ├── FeesPlans.jsx
+                ├── Pricing.jsx
+
+--- START OF FILE: src\Pages\Pricing\FeesPlans.jsx ---
+
+import { motion, useAnimation, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
+import BankDetailsModal from "../../Components/BankDetailsModal";
+
+function FeesPlans() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activePlan, setActivePlan] = useState(0);
+  const [showSuccessMsg, setShowSuccessMsg] = useState(false);
+
+  const plans = [
+    {
+      price: 'Common',
+      title: '30$/month',
+      frequency: '2 Days/week',
+      features: ['30 Min Lesson', '8 Classes/Month', '4 hours/Month'],
+    },
+    {
+      price: 'Suggested',
+      title: '$40/month',
+      frequency: '3 Days/Week',
+      features: ['30 Min Lesson', '12 Classes/Month', '6 hours/Month'],
+    },
+    {
+      price: 'Recommended',
+      title: '$50/month',
+      frequency: '4 Days/Week',
+      features: ['30 Min Lesson', '20 Classes/Month', '10 hours/Month'],
+    },
+    {
+      price: 'Recommended',
+      title: '$60/month',
+      frequency: '5 Days/Week',
+      features: ['30 Min Lesson', '20 Classes/Month', '10 hours/Month'],
+    },
+    {
+      price: 'Recommended',
+      title: '$70/month',
+      frequency: '6 Days/Week',
+      features: ['30 Min Lesson', '20 Classes/Month', '10 hours/Month'],
+    },
+    {
+      price: 'Recommended',
+      title: '$80/month',
+      frequency: '7 Days/Week',
+      features: ['30 Min Lesson', '20 Classes/Month', '10 hours/Month'],
+    },
+  ];
+
+  const discounts = [
+    { label: '10% for New & Disabled Muslims' },
+    { label: '10% discount for siblings' },
+    { label: '10% discount on Referrals' },
+  ];
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  };
+
+  const handleConfirmPayment = () => {
+    setIsModalOpen(false);
+    setShowSuccessMsg(true);
+    // Hide message after 10 seconds
+    setTimeout(() => setShowSuccessMsg(false), 10000);
+  };
+
+  return (
+    <section className='sm:pt-8 pt-5 relative'>
+      {/* Success Message Notification */}
+      <AnimatePresence>
+        {showSuccessMsg && (
+          <motion.div
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 20, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            className="fixed top-5 left-1/2 -translate-x-1/2 z-[200] bg-[#1C8E5A] text-white p-4 rounded-2xl shadow-2xl text-center max-w-md border-2 border-[#FFD050]"
+          >
+            <p className="font-bold">Registration Initiated!</p>
+            <p className="text-sm mt-1">After successful payment, please share the payment receipt on the WhatsApp number (+92 3132661982) with your details to confirm your admission.</p>
+            <button onClick={() => setShowSuccessMsg(false)} className="mt-2 text-xs underline">Dismiss</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Exclusive Discounts */}
+      <div className='px-10 md:px-20 mt-12'>
+        <h3 className='text-2xl font-bold text-center mb-6 text-[#1A1A1A]'>Exclusive Discounts</h3>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          {discounts.map((discount, index) => {
+            const { ref, inView } = useInView({ threshold: 0.2, triggerOnce: true });
+            return (
+              <motion.div
+                key={index} ref={ref}
+                className='rounded-lg shadow-lg p-6 bg-[#FFF6E0] flex items-center gap-4'
+                variants={cardVariants} initial='hidden' animate={inView ? 'visible' : 'hidden'}
+              >
+                <img src='/uil_check.svg' alt='tick' className='h-6 w-6' />
+                <p className='font-medium text-[#4F4F4F]'>{discount.label}</p>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className='flex flex-col justify-center items-center p-4 mt-10'>
+        <p className='font-bold text-3xl sm:text-6xl text-center mb-6 text-[#1A1A1A] leading-tight'>
+          <span>Fees</span> and <span>Plans</span>
+        </p>
+        <p className='font-medium sm:text-lg md:text-xl w-full md:w-2/3 mx-auto text-center mb-6 text-[#4F4F4F]'>
+          Direct Enrollment Plans: Choose your preferred schedule and proceed with direct payment to start your journey.
+        </p>
+      </div>
+
+      <div className='px-10 md:px-20'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-8'>
+          {plans.map((plan, index) => {
+            const { ref, inView } = useInView({ threshold: 0.2, triggerOnce: true });
+            return (
+              <motion.div
+                key={index} ref={ref}
+                className='rounded-[50px] shadow-md  p-6 bg-white flex flex-col items-center border-2 border-transparent hover:border-[#FFD050] transition-all'
+                variants={cardVariants} initial='hidden' animate={inView ? 'visible' : 'hidden'}
+              >
+                <button className='h-[55px] w-[160px] bg-[#FFD050] text-[#1A1A1A] font-semibold text-lg rounded-2xl mb-5 -mt-[40px]'>
+                  {plan.price}
+                </button>
+                <h3 className='text-xl font-semibold mb-2 text-center'>{plan.title}</h3>
+                <p className='mb-2 text-center text-sm'>{plan.frequency}</p>
+                <div className='flex flex-col gap-3 m-6'>
+                  {plan.features.map((f, i) => (
+                    <div key={i} className='flex items-center gap-2'><img src='/uil_check.svg' className='h-5' /><p>{f}</p></div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => { setIsModalOpen(true); setActivePlan(index); }}
+                  className={`h-[45px] w-[140px] font-semibold rounded-full ${activePlan === index ? 'bg-[#1C8E5A] text-white' : 'bg-[#FFD050] text-black'}`}
+                >
+                  Select Plan
+                </button>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+
+      <BankDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        plan={plans[activePlan]}
+        onConfirm={handleConfirmPayment}
+      />
+    </section>
+  );
+}
+
+export default FeesPlans;
+
+--- END OF FILE: src\Pages\Pricing\FeesPlans.jsx ---
+
+================================================================================
+
+
+--- START OF FILE: src\Pages\Pricing\Pricing.jsx ---
+
+import React  from "react";
+import FeesPlans from "./FeesPlans";
+import FreeTrail from "../AboutUs/FreeTrail";
+import Footer from "../../Components/Footer";
+
+function Pricing() {
+
+  return (
+    <>
+      <section className="relative bg-gray-100">
+        <div className="flex justify-between">
+          <div className="relative w-1/2">
+            <img
+              src="/image (2).png"
+              alt=""
+              className="w-full h-auto object-cover"
+            />
+          </div>
+          <div className="relative w-1/2">
+            <img
+              src="/image (3).png"
+              alt=""
+              className="w-full h-auto object-cover"
+            />
+          </div>
+        </div>
+        <h1 className="absolute inset-0 flex items-center justify-center font-semibold text-3xl sm:text-4xl md:text-5xl xl:text-7xl text-[#1A1A1A]">
+          Pricing
+        </h1>
+      </section>
+      <FeesPlans />
+      <div className="px-4 md:px-10">
+        <FreeTrail />
+      </div>
+      <Footer />
+    </>
+  );
+}
+
+export default Pricing;
+
+
+--- END OF FILE: src\Pages\Pricing\Pricing.jsx ---
+
+================================================================================
+

@@ -1,5 +1,4 @@
 // FreeTrail.js
-import emailjs from 'emailjs-com'; // Import Email.js
 import { motion, useAnimation } from 'framer-motion';
 import { LockIcon, BookOpen } from 'lucide-react'; // Added BookOpen icon
 import React, { useState } from 'react';
@@ -7,6 +6,8 @@ import { useInView } from 'react-intersection-observer';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import { toast } from 'sonner';
+import axios from 'axios';
+import OTPVerification from '../../Components/OTPVerification';
 
 // Course options extracted from your images
 const COURSES = [
@@ -31,6 +32,8 @@ function FreeTrail() {
   const [input4, setInput4] = useState('');
   const [course, setCourse] = useState(''); // New state for course
   const [showDropdown, setShowDropdown] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showOTPVerification, setShowOTPVerification] = useState(false);
 
   // Animation setup
   const controls = useAnimation();
@@ -55,50 +58,51 @@ function FreeTrail() {
     setShowDropdown(false);
   };
 
-  const handleEnrollNowClick = () => {
-    // Define the email template parameters
-    const templateParams = {
-      to_name: 'Admin',
-      from_name: input1,
-      user_email: input3,
-      user_mobile: phone,
-      user_message: input4,
-      selected_course: course, // Added course to email params
-      name: input1,
-      mobile: phone,
-      email: input3,
-      message: input4,
-      course: course, // Added course to email params
-    };
+  const handleEnrollNowClick = async () => {
+    // Validate required fields
+    if (!input1 || !input3 || !phone || !course) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
 
-    // Send the email
-    emailjs
-      .send(
-        'service_a684mqv',
-        'template_x3m5vdh',
-        templateParams,
-        'R7RzaQFicwRxMNsAH'
-      )
-      .then(
-        result => {
-          console.log('Email sent successfully:', result.text);
-          toast.success('Email sent successfully!');
-        },
-        error => {
-          console.error('Error sending email:', error);
-          toast.error('Failed to send the email, please try again.');
-        }
-      );
+    setLoading(true);
+    try {
+      // Send the data to the backend API
+      const response = await axios.post('/api/v1/auth/register', {
+        name: input1,
+        email: input3,
+        phone: phone,
+        message: input4,
+        course: course,
+        gender: selectedOption,
+        password: input5, // Using the password field for registration
+        registrationType: 'form' // Free trial registration
+      });
+
+      if (response.data) {
+        toast.success('Trial registration submitted successfully! Please check your email for the OTP.');
+        // Show OTP verification modal instead of resetting
+        setShowOTPVerification(true);
+      } else {
+        toast.error(response.data.message || 'Failed to submit trial request');
+      }
+    } catch (error) {
+      console.error('Error submitting trial request:', error);
+      toast.error(error.response?.data?.message || 'Failed to submit trial request');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <motion.section
-      className='bg-[#1C8E5A] rounded-3xl p-4 mt-10'
-      ref={ref}
-      variants={sectionVariants}
-      initial='hidden'
-      animate={controls}
-    >
+    <>
+      <motion.section
+        className='bg-[#1C8E5A] rounded-3xl p-4 mt-10'
+        ref={ref}
+        variants={sectionVariants}
+        initial='hidden'
+        animate={controls}
+      >
       <div className='grid grid-cols-1 md:grid-cols-12 gap-4 bg-[#1C8E5A] overflow-hidden'>
         <div className='col-span-12 md:col-span-5 flex justify-center items-center'>
           <motion.img
@@ -245,15 +249,46 @@ function FreeTrail() {
             <div className='flex justify-center mt-2'>
               <button
                 onClick={handleEnrollNowClick}
-                className='bg-[#FFD050] text-nowrap w-full rounded-full px-6 py-2 transition duration-300 ease-in-out hover:bg-[#FFC048] focus:outline-none focus:ring-2 focus:ring-[#FFD050] focus:ring-opacity-50 font-bold'
+                disabled={loading}
+                className='bg-[#FFD050] text-nowrap w-full rounded-full px-6 py-2 transition duration-300 ease-in-out hover:bg-[#FFC048] focus:outline-none focus:ring-2 focus:ring-[#FFD050] focus:ring-opacity-50 font-bold flex items-center justify-center'
               >
-                Start 3 Days Free Trial
+                {loading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </>
+                ) : 'Start 3 Days Free Trial'}
               </button>
             </div>
           </motion.div>
         </div>
       </div>
     </motion.section>
+
+    {/* OTP Verification Modal */}
+    {showOTPVerification && (
+      <OTPVerification
+        email={input3}
+        onClose={() => setShowOTPVerification(false)}
+        onSuccess={() => {
+          setShowOTPVerification(false);
+          // Reset form fields after successful verification
+          setInput1('');
+          setPhone('');
+          setInput3('');
+          setInput4('');
+          setInput5('');
+          setCourse('');
+          setSelectedOption('Male');
+          // Redirect to login page after successful verification
+          window.location.href = '/login';
+        }}
+      />
+    )}
+    </>
   );
 }
 

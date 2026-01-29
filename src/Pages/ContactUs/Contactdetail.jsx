@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import emailjs from "emailjs-com";
 import { toast } from 'sonner';
+import axios from 'axios';
 
 function ContactDetail() {
   const [input1, setInput1] = useState("");
   const [input2, setInput2] = useState("");
   const [input3, setInput3] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const contactInfo = [
     {
@@ -37,36 +38,42 @@ function ContactDetail() {
     },
   ];
 
-  const handleEnrollNowClick = (e) => {
+  const handleEnrollNowClick = async (e) => {
     e.preventDefault(); // Prevent form submission
 
-    // Define the email template parameters
-    const templateParams = {
-      to_name: "Admin",
-      from_name: input1,
-      user_email: input3,
-      user_mobile: input2,
-      user_message: message, // Changed to use `message`
-    };
+    // Validate required fields
+    if (!input1 || !input2 || !input3 || !message) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
 
-    // Send the email
-    emailjs
-      .send(
-        "service_a684mqv",
-        "template_x3m5vdh",
-        templateParams,
-        "R7RzaQFicwRxMNsAH" // Replace with your Email.js user ID
-      )
-      .then(
-        (result) => {
-          console.log("Email sent successfully:", result.text);
-          toast.success("Email sent successfully!");
-        },
-        (error) => {
-          console.error("Error sending email:", error);
-          toast.error("Failed to send the email, please try again.");
-        }
-      );
+    setLoading(true);
+    try {
+      // Send the data to the backend API
+      const response = await axios.post('/api/v1/contact', {
+        name: input1,
+        phone: input2,
+        email: input3,
+        message: message,
+        type: 'contact_query'
+      });
+
+      if (response.data) {
+        toast.success('Contact message sent successfully! We will get back to you soon.');
+        // Reset form fields
+        setInput1('');
+        setInput2('');
+        setInput3('');
+        setMessage('');
+      } else {
+        toast.error(response.data.message || 'Failed to send contact message');
+      }
+    } catch (error) {
+      console.error('Error sending contact message:', error);
+      toast.error(error.response?.data?.message || 'Failed to send contact message');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -161,9 +168,18 @@ function ContactDetail() {
             <div className="flex justify-center items-center mt-8 md:mt-10">
               <button
                 type="submit" // Ensure it triggers form submission
-                className="bg-[#FFD050] font-semibold py-2 px-4 rounded-full hover:bg-yellow-400 w-3/4"
+                disabled={loading}
+                className="bg-[#FFD050] font-semibold py-2 px-4 rounded-full hover:bg-yellow-400 w-3/4 flex items-center justify-center"
               >
-                Enroll Now
+                {loading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Sending...
+                  </>
+                ) : 'Send Message'}
               </button>
             </div>
           </div>
