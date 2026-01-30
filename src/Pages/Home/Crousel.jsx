@@ -87,11 +87,9 @@ const Carousel = () => {
       {slides.map((slide, index) => (
         <motion.div
           key={index}
-          className={`absolute w-50 md:w-full md:h-full ${
-            isMobile ? 'bg-contain bg-no-repeat' : 'bg-cover'
-          } flex items-center justify-between ${
-            currentIndex === index ? 'block' : 'hidden'
-          } ${isMobile ? slide.bgImageMobile : slide.bgImageDesktop}`}
+          className={`absolute w-50 md:w-full md:h-full ${isMobile ? 'bg-contain bg-no-repeat' : 'bg-cover'
+            } flex items-center justify-between ${currentIndex === index ? 'block' : 'hidden'
+            } ${isMobile ? slide.bgImageMobile : slide.bgImageDesktop}`}
           initial='hidden'
           animate='visible'
           exit='hidden'
@@ -133,9 +131,8 @@ const Carousel = () => {
 
           {/* Social Media Icons */}
           <motion.div
-            className={`absolute right-13 md:right-0  top-[45%] md:top-[30%] transform -translate-y-1/2 ${
-              isMobile ? 'flex-row space-x-6' : 'flex-col space-y-4'
-            } flex mr-4`}
+            className={`absolute right-13 md:right-0  top-[45%] md:top-[30%] transform -translate-y-1/2 ${isMobile ? 'flex-row space-x-6' : 'flex-col space-y-4'
+              } flex mr-4`}
             variants={iconVariants}
             initial='hidden'
             animate='visible'
@@ -196,9 +193,8 @@ const Carousel = () => {
         {slides.map((_, index) => (
           <button
             key={index}
-            className={`w-3 h-3 rounded-full ${
-              currentIndex === index ? 'bg-yellow-500' : 'bg-gray-300'
-            }`}
+            className={`w-3 h-3 rounded-full ${currentIndex === index ? 'bg-yellow-500' : 'bg-gray-300'
+              }`}
             onClick={() => setCurrentIndex(index)}
           />
         ))}
