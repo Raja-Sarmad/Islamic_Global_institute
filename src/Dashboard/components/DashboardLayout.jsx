@@ -33,13 +33,15 @@ export default function DashboardLayout({ children }) {
         </main>
       </div>
 
-      {/* Mobile Menu Button */}
-      <button
-        onClick={handleToggleSidebar}
-        className="fixed bottom-8 right-8 md:hidden p-3 bg-primary text-white rounded-full shadow-lg hover:bg-primary/90 transition z-40"
-      >
-        <Menu className="w-6 h-6" />
-      </button>
+      {/* Mobile Menu Button - Only show when sidebar is closed on mobile */}
+      {!sidebarOpen && (
+        <button
+          onClick={handleToggleSidebar}
+          className="fixed bottom-8 right-8 md:hidden p-3 bg-[#1C8E5A] text-white rounded-full shadow-lg hover:bg-[#157a4a] transition z-40"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
+      )}
     </div>
   );
 }

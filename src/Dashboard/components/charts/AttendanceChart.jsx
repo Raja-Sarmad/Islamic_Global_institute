@@ -11,15 +11,25 @@ import {
   PieChart,
   Pie,
   Cell,
+  LabelList,
 } from 'recharts';
 
 const AttendanceChart = ({ data }) => {
-  // Process data for bar chart
-  const barChartData = data.slice(0, 10).map((item, index) => ({
-    name: new Date(item.date).toLocaleDateString(),
-    status: item.status,
-    lesson: item.lesson || `Lesson ${index + 1}`,
-  }));
+  // Process data for bar chart - create separate values for each status type
+  const barChartData = data.slice(0, 10).map((item, index) => {
+    const result = {
+      name: new Date(item.date).toLocaleDateString(),
+      lesson: item.lesson || `Lesson ${index + 1}`,
+    };
+
+    // Set the appropriate status value to 1, others to 0
+    result[item.status] = 1;
+    result.present = result.present || 0;
+    result.absent = result.absent || 0;
+    result.late = result.late || 0;
+
+    return result;
+  });
 
   // Process data for pie chart
   const statusCounts = data.reduce((acc, item) => {
@@ -46,7 +56,7 @@ const AttendanceChart = ({ data }) => {
             <BarChart data={barChartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="name" stroke="#6b7280" />
-              <YAxis stroke="#6b7280" />
+              <YAxis stroke="#6b7280" domain={[0, 1]} />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: 'white', 
@@ -55,7 +65,9 @@ const AttendanceChart = ({ data }) => {
                 }} 
               />
               <Legend />
-              <Bar dataKey="lesson" fill="#1C8E5A" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="present" fill="#1C8E5A" name="Present" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="absent" fill="#FF6B6B" name="Absent" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="late" fill="#FFD050" name="Late" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

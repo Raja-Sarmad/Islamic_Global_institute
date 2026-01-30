@@ -137,11 +137,25 @@ export default function Overview() {
         variants={itemVariants}
         className="grid grid-cols-1 lg:grid-cols-2 gap-6"
       >
-        {progressHistory.length > 0 && (
+        {progressHistory.length > 0 ? (
           <AttendanceChart data={progressHistory} />
+        ) : (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Attendance Analysis</h2>
+            <div className="flex items-center justify-center h-80 text-gray-500">
+              No attendance data available yet
+            </div>
+          </div>
         )}
-        {progressHistory.length > 0 && (
+        {progressHistory.length > 0 ? (
           <ProgressChart data={progressHistory} />
+        ) : (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Learning Progress</h2>
+            <div className="flex items-center justify-center h-80 text-gray-500">
+              No progress data available yet
+            </div>
+          </div>
         )}
       </motion.div>
 

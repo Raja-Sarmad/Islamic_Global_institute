@@ -13,16 +13,25 @@ import {
 
 const ProgressChart = ({ data }) => {
   // Process data for progress chart
-  const progressData = data.map((item, index) => ({
-    date: new Date(item.date).toLocaleDateString(),
-    index: index + 1,
-    status: item.status,
-    performance: item.performance ? 
-      (item.performance.toLowerCase() === 'excellent' ? 100 : 
-       item.performance.toLowerCase() === 'good' ? 80 : 
-       item.performance.toLowerCase() === 'average' ? 60 : 
-       item.performance.toLowerCase() === 'needs_improvement' ? 40 : 50) : 50,
-  }));
+  const progressData = data.map((item, index) => {
+    let performanceScore = 50; // default value
+
+    if (item.performance) {
+      const perf = typeof item.performance === 'string' ? item.performance.toLowerCase() : item.performance;
+      if (perf === 'excellent') performanceScore = 100;
+      else if (perf === 'good') performanceScore = 80;
+      else if (perf === 'average') performanceScore = 60;
+      else if (perf === 'needs_improvement') performanceScore = 40;
+      else if (typeof perf === 'number') performanceScore = perf; // if it's already a number
+    }
+
+    return {
+      date: new Date(item.date).toLocaleDateString(),
+      index: index + 1,
+      status: item.status,
+      performance: performanceScore,
+    };
+  });
 
   return (
     <div className="bg-white rounded-lg shadow p-6">

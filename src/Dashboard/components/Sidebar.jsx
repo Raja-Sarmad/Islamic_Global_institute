@@ -92,7 +92,7 @@ export default function Sidebar() {
             </div>
             {sidebarOpen && (
               <div className="min-w-0">
-                <h1 className="text-lg font-bold">Islamic Global Institute</h1>
+                <h1 className="text-lg leading-none font-bold">Islamic Global Institute</h1>
                 <p className="text-xs text-gray-400">Student Dashboard</p>
               </div>
             )}
@@ -123,6 +123,7 @@ export default function Sidebar() {
                     : 'text-gray-300 hover:bg-gray-800'
                 }`}
                 title={!sidebarOpen ? item.label : ''}
+                onClick={() => scrollTo(0,0)}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
                 {sidebarOpen && (

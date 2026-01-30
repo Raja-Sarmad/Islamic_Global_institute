@@ -1,25 +1,43 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { uiActions } from '../store/store';
 import { useAuth } from '../../context/AuthContext';
-import { Clock, Bell } from 'lucide-react';
+import { Clock, Bell, Menu } from 'lucide-react';
 
 export default function Header() {
+  const dispatch = useDispatch();
+  const { sidebarOpen } = useSelector(state => state.ui);
   const { user } = useAuth();
   const currentTime = new Date().toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
   });
 
+  const handleToggleSidebar = () => {
+    dispatch(uiActions.toggleSidebar());
+  };
+
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4 md:px-8">
       <div className="flex items-center justify-between">
         {/* Left Section */}
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            Welcome back, {user?.name?.split(' ')[0]}!
-          </h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Here's your learning dashboard
-          </p>
+        <div className="flex items-center gap-4">
+          {/* Sidebar Toggle Button */}
+          <button
+            onClick={handleToggleSidebar}
+            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Welcome back, {user?.name?.split(' ')[0]}!
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Here's your learning dashboard
+            </p>
+          </div>
         </div>
 
         {/* Right Section */}
